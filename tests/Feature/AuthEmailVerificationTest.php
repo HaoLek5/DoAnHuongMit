@@ -147,7 +147,6 @@ class AuthEmailVerificationTest extends TestCase
 
         // Thiếu OTP
         $response = $this->actingAs($user)->put(route('account.password.update'), [
-            'current_password' => 'OldPassword123',
             'password' => 'NewPassword123',
             'password_confirmation' => 'NewPassword123',
         ]);
@@ -156,7 +155,6 @@ class AuthEmailVerificationTest extends TestCase
         // Sai OTP
         EmailVerification::generate($user->email, 'change_password');
         $responseWrongOtp = $this->actingAs($user)->put(route('account.password.update'), [
-            'current_password' => 'OldPassword123',
             'verification_code' => '000000',
             'password' => 'NewPassword123',
             'password_confirmation' => 'NewPassword123',
@@ -165,7 +163,7 @@ class AuthEmailVerificationTest extends TestCase
         $this->assertTrue(Hash::check('OldPassword123', $user->fresh()->password));
     }
 
-    public function test_user_can_change_password_with_valid_otp_and_current_password(): void
+    public function test_user_can_change_password_with_valid_otp(): void
     {
         $user = User::factory()->create([
             'password' => Hash::make('OldPassword123'),
@@ -174,7 +172,6 @@ class AuthEmailVerificationTest extends TestCase
         $code = EmailVerification::generate($user->email, 'change_password');
 
         $response = $this->actingAs($user)->put(route('account.password.update'), [
-            'current_password' => 'OldPassword123',
             'verification_code' => $code,
             'password' => 'NewPassword456',
             'password_confirmation' => 'NewPassword456',
@@ -280,5 +277,26 @@ class AuthEmailVerificationTest extends TestCase
             'email' => 'reset_success@example.com',
             'action' => 'reset_password',
         ]);
+    }
+
+    public function test_user_can_update_profile_without_changing_email(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Original Name',
+            'email' => 'original@example.com',
+            'phone' => '0901111111',
+        ]);
+
+        $response = $this->actingAs($user)->put(route('account.profile.update'), [
+            'name' => 'Updated Name',
+            'phone' => '0902222222',
+            'email' => 'hacker_attempt@example.com',
+        ]);
+
+        $response->assertSessionHas('account_success');
+        $user->refresh();
+        $this->assertEquals('Updated Name', $user->name);
+        $this->assertEquals('0902222222', $user->phone);
+        $this->assertEquals('original@example.com', $user->email);
     }
 }

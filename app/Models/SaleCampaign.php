@@ -41,16 +41,18 @@ class SaleCampaign extends Model
      */
     public function getStatusAttribute(): string
     {
+        $now = now();
+
+        if ($now->gt($this->end_time)) {
+            return 'ended';
+        }
+
         if (! $this->is_active) {
             return 'paused';
         }
 
-        $now = now();
         if ($now->lt($this->start_time)) {
             return 'upcoming';
-        }
-        if ($now->gt($this->end_time)) {
-            return 'ended';
         }
 
         return 'running';
@@ -68,6 +70,38 @@ class SaleCampaign extends Model
             'paused' => 'Đã tạm dừng',
             default => 'Không xác định',
         };
+    }
+
+    /**
+     * Check if campaign has ended
+     */
+    public function isEnded(): bool
+    {
+        return now()->gt($this->end_time);
+    }
+
+    /**
+     * Check if campaign has started or is currently running
+     */
+    public function hasStartedOrRunning(): bool
+    {
+        return now()->gte($this->start_time);
+    }
+
+    /**
+     * Check if campaign can be deleted (only upcoming / not yet started)
+     */
+    public function canBeDeleted(): bool
+    {
+        return now()->lt($this->start_time);
+    }
+
+    /**
+     * Check if campaign can be edited (not ended)
+     */
+    public function canBeEdited(): bool
+    {
+        return ! $this->isEnded();
     }
 
     /**

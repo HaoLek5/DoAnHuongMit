@@ -59,180 +59,86 @@
                 <div class="lg:col-span-7 space-y-6">
 
                     <!-- 1. THÔNG TIN NHẬN HÀNG -->
-                    <div class="bg-white rounded-3xl border border-primary-100 p-6 sm:p-7 shadow-xs">
-                        
-                        <div class="flex items-center justify-between mb-5 pb-3 border-b border-slate-100">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-8 h-8 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold text-sm">1</span>
-                                <h2 class="text-base font-bold text-slate-800">Thông tin nhận hàng</h2>
-                            </div>
+                    <div class="bg-white rounded-3xl border border-primary-100 p-5 sm:p-6 shadow-xs">
+                        <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-100">
+                            <h2 class="text-base font-bold text-slate-800">Thông tin nhận hàng</h2>
 
-                            <!-- Action buttons in header -->
-                            <div class="flex items-center gap-2">
-                                <button type="button" @click="openAddressModal()"
-                                        class="px-3.5 py-1.5 rounded-xl bg-primary-50 hover:bg-primary-100 text-primary text-xs font-bold transition-all flex items-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                    <span>Thêm địa chỉ</span>
-                                </button>
+                            <div>
+                                <template x-if="selectedAddress && addresses.length > 1">
+                                    <button type="button" @click="openSelectModal()"
+                                            class="text-xs font-bold text-primary hover:text-primary-700 transition-colors">
+                                        Đổi địa chỉ
+                                    </button>
+                                </template>
+                                <template x-if="!selectedAddress || addresses.length <= 1">
+                                    <button type="button" @click="openAddressModal()"
+                                            class="text-xs font-bold text-primary hover:text-primary-700 transition-colors">
+                                        + Thêm địa chỉ
+                                    </button>
+                                </template>
                             </div>
                         </div>
 
                         <!-- TRƯỜNG HỢP 1: ĐÃ CÓ ĐỊA CHỈ ĐƯỢC CHỌN -->
                         <template x-if="selectedAddress">
-                            <div class="p-5 sm:p-6 rounded-2xl border-2 border-primary/40 bg-gradient-to-r from-primary-50/25 via-white to-primary-50/10 shadow-2xs transition-all relative">
-                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                                    <div class="flex items-start gap-3.5">
-                                        <span class="w-10 h-10 rounded-2xl bg-primary text-white flex items-center justify-center flex-shrink-0 mt-0.5 shadow-xs">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                            </svg>
+                            <div class="p-4 rounded-2xl border border-slate-200/80 bg-slate-50/50 text-xs space-y-1">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="text-sm font-extrabold text-slate-900" x-text="selectedAddress.receiver_name"></span>
+                                    <span class="text-slate-300">|</span>
+                                    <span class="font-bold text-slate-700" x-text="selectedAddress.receiver_phone"></span>
+                                    <template x-if="selectedAddress.is_default">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary">
+                                            Mặc định
                                         </span>
-                                        <div class="space-y-1 text-xs">
-                                            <div class="flex items-center gap-2 flex-wrap">
-                                                <span class="text-sm font-extrabold text-slate-900" x-text="selectedAddress.receiver_name"></span>
-                                                <span class="text-slate-300">|</span>
-                                                <span class="text-xs font-bold text-slate-700" x-text="selectedAddress.receiver_phone"></span>
-                                                <template x-if="selectedAddress.is_default">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-white">
-                                                        Mặc định
-                                                    </span>
-                                                </template>
-                                            </div>
-
-                                            <div class="font-bold text-slate-800 text-xs sm:text-[13px] pt-1" x-text="selectedAddress.detail_address"></div>
-                                            <p class="text-slate-500 font-medium leading-relaxed" x-text="formatFullAddress(selectedAddress)"></p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Nút Thay đổi -->
-                                    <div class="flex items-center gap-2 self-end sm:self-start">
-                                        <template x-if="addresses.length > 1">
-                                            <button type="button" @click="openSelectModal()"
-                                                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-primary hover:text-primary bg-white text-slate-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 whitespace-nowrap">
-                                                <span>Thay đổi</span>
-                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                                            </button>
-                                        </template>
-                                        <template x-if="addresses.length <= 1">
-                                            <button type="button" @click="openAddressModal()"
-                                                    class="px-3.5 py-2 rounded-xl border border-slate-200 hover:border-primary hover:text-primary bg-white text-slate-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5 whitespace-nowrap">
-                                                <span>+ Thêm địa chỉ khác</span>
-                                            </button>
-                                        </template>
-                                    </div>
+                                    </template>
                                 </div>
-
-                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-emerald-600 font-semibold">
-                                    <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                    <span>Đơn hàng sẽ được chuyển tới địa chỉ này</span>
-                                </div>
+                                <p class="text-slate-600 leading-normal" x-text="formatFullAddress(selectedAddress)"></p>
                             </div>
                         </template>
 
                         <!-- TRƯỜNG HỢP 2: CHƯA CÓ ĐỊA CHỈ NÀO -->
                         <template x-if="!selectedAddress">
-                            <div class="p-8 rounded-2xl border-2 border-dashed border-primary-200 bg-primary-50/20 text-center space-y-3">
-                                <div class="w-14 h-14 rounded-2xl bg-white text-primary border border-primary-100 flex items-center justify-center mx-auto shadow-xs">
-                                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                </div>
-
-                                <div>
-                                    <h3 class="text-sm font-bold text-slate-800">Chưa có địa chỉ nhận hàng</h3>
-                                    <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                                        Bạn chưa có địa chỉ nhận hàng nào được lưu. Vui lòng thêm địa chỉ để Hương Mít giao hàng tận nơi.
-                                    </p>
-                                </div>
-
-                                <div class="pt-2">
-                                    <button type="button" @click="openAddressModal()"
-                                            class="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary to-rose-500 hover:from-primary-600 hover:to-rose-600 text-white font-bold text-xs shadow-md shadow-primary/20 hover:shadow-lg transition-all inline-flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                                        </svg>
-                                        <span>Thêm địa chỉ giao hàng mới</span>
-                                    </button>
-                                </div>
+                            <div class="py-4 text-center">
+                                <p class="text-xs text-slate-500 mb-2">Chưa có thông tin địa chỉ nhận hàng.</p>
+                                <button type="button" @click="openAddressModal()"
+                                        class="px-4 py-2 rounded-xl bg-primary text-white font-bold text-xs hover:bg-primary-600 transition-colors">
+                                    + Thêm địa chỉ nhận hàng
+                                </button>
                             </div>
                         </template>
-
                     </div>
 
                     <!-- 2. PHƯƠNG THỨC THANH TOÁN -->
-                    <div class="bg-white rounded-3xl border border-primary-100 p-6 sm:p-7 shadow-xs">
-                        <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-100">
-                            <span class="w-8 h-8 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold text-sm">2</span>
-                            <div>
-                                <h2 class="text-base font-bold text-slate-800">Phương thức thanh toán</h2>
-                                <p class="text-[11px] text-slate-400 mt-0.5">Lựa chọn hình thức thanh toán thuận tiện nhất cho bạn</p>
-                            </div>
-                        </div>
+                    <div class="bg-white rounded-3xl border border-primary-100 p-5 sm:p-6 shadow-xs">
+                        <h2 class="text-base font-bold text-slate-800 mb-3 pb-3 border-b border-slate-100">Phương thức thanh toán</h2>
 
-                        <div class="space-y-3">
+                        <div class="space-y-2.5">
                             <!-- COD Option -->
-                            <label class="relative block p-4 sm:p-5 rounded-2xl border-2 cursor-pointer shadow-xs transition-all"
-                                   :class="paymentMethod === 'cod' ? 'border-primary bg-primary-50/15 ring-2 ring-primary/10' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
-                                <div class="flex items-start gap-3.5">
+                            <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
+                                   :class="paymentMethod === 'cod' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
+                                <div class="flex items-center gap-3">
                                     <input type="radio" name="payment_method" value="cod" x-model="paymentMethod"
-                                           class="mt-1 text-primary focus:ring-primary h-4 w-4 border-slate-300">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 flex-wrap mb-1">
-                                            <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">💵</span>
-                                            <h3 class="text-sm font-bold text-slate-800">Thanh toán khi nhận hàng (COD)</h3>
-                                            <template x-if="totalPrice <= 400000">
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                                                    Tiền mặt
-                                                </span>
-                                            </template>
-                                            <template x-if="totalPrice > 400000">
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                                                    Cần cọc 40% VietQR
-                                                </span>
-                                            </template>
-                                        </div>
-                                        <template x-if="totalPrice <= 400000">
-                                            <p class="text-xs text-slate-600 leading-relaxed mt-1">
-                                                Bạn chỉ thanh toán tiền mặt cho nhân viên giao hàng sau khi đã nhận và kiểm tra kiện hàng.
-                                            </p>
-                                        </template>
-                                        <template x-if="totalPrice > 400000">
-                                            <div class="mt-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                                                <div class="font-bold flex items-center gap-1.5 text-amber-950">
-                                                    <span>⚠️</span>
-                                                    <span>Đơn hàng trên 400.000 đ yêu cầu chuyển khoản cọc 40%:</span>
-                                                </div>
-                                                <div class="text-[11px] leading-relaxed text-amber-800">
-                                                    • Cọc trước 40%: <strong class="text-amber-700 font-extrabold" x-text="formatCurrency(depositAmount)"></strong> qua mã VietQR tự động.<br>
-                                                    • Còn lại 60%: <strong class="text-slate-800 font-bold" x-text="formatCurrency(remainingAmount)"></strong> sẽ thanh toán tiền mặt cho shipper khi nhận hàng.
-                                                </div>
-                                            </div>
-                                        </template>
-                                    </div>
+                                           class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
+                                    <span class="text-xs sm:text-sm font-bold text-slate-800">Thanh toán khi nhận hàng (COD)</span>
                                 </div>
+                                <template x-if="totalPrice > 400000">
+                                    <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
+                                        Cọc 40% (<span x-text="formatCurrency(depositAmount)"></span>)
+                                    </span>
+                                </template>
                             </label>
 
                             <!-- Bank Transfer (VietQR) Option -->
-                            <label class="relative block p-4 sm:p-5 rounded-2xl border-2 cursor-pointer shadow-xs transition-all"
-                                   :class="paymentMethod === 'bank_transfer' ? 'border-primary bg-primary-50/15 ring-2 ring-primary/10' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
-                                <div class="flex items-start gap-3.5">
+                            <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
+                                   :class="paymentMethod === 'bank_transfer' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
+                                <div class="flex items-center gap-3">
                                     <input type="radio" name="payment_method" value="bank_transfer" x-model="paymentMethod"
-                                           class="mt-1 text-primary focus:ring-primary h-4 w-4 border-slate-300">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 flex-wrap mb-1">
-                                            <span class="w-6 h-6 rounded-lg bg-primary-100 text-primary flex items-center justify-center text-xs font-bold">🏦</span>
-                                            <h3 class="text-sm font-bold text-slate-800">Chuyển khoản ngân hàng qua mã VietQR</h3>
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary text-white">
-                                                Tự động 24/7
-                                            </span>
-                                        </div>
-                                        <p class="text-xs text-slate-600 leading-relaxed mt-1">
-                                            Hệ thống hiển thị mã QR có sẵn số tiền đơn hàng. Bạn có 10 phút để quét mã bằng App ngân hàng. Sau khi chuyển thành công, hệ thống mới trừ tồn kho và xác nhận đơn.
-                                        </p>
-                                    </div>
+                                           class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
+                                    <span class="text-xs sm:text-sm font-bold text-slate-800">Chuyển khoản ngân hàng (VietQR)</span>
                                 </div>
+                                <span class="text-[11px] font-bold text-primary bg-primary-50 px-2.5 py-0.5 rounded-lg border border-primary-100">
+                                    Tự động 24/7
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -415,21 +321,11 @@
                  class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-lg border border-slate-100">
 
                 <!-- Modal Header -->
-                <div class="px-6 py-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-primary-300">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-base text-white">Thêm địa chỉ giao hàng mới</h3>
-                            <p class="text-xs text-slate-300">Nhập thông tin người nhận và địa chỉ giao hàng chính xác</p>
-                        </div>
-                    </div>
-                    <button type="button" @click="showAddressModal = false" class="text-slate-400 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/10">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                    <h3 class="font-bold text-base text-slate-800">Thêm địa chỉ giao hàng mới</h3>
+                    <button type="button" @click="showAddressModal = false"
+                            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>

@@ -149,8 +149,6 @@
                                    class="w-4 h-4 rounded text-primary focus:ring-primary/20 border-slate-300 cursor-pointer">
                         </th>
                         <th class="py-3.5 px-4">Mã đơn & Ngày đặt</th>
-                        <th class="py-3.5 px-4">Người nhận & SĐT</th>
-                        <th class="py-3.5 px-4">Sản phẩm</th>
                         <th class="py-3.5 px-4 text-right">Tổng tiền</th>
                         <th class="py-3.5 px-4 text-center">Trạng thái</th>
                         <th class="py-3.5 px-6 text-right">Thao tác</th>
@@ -182,26 +180,6 @@
                                     @endif
                                 </div>
                                 <p class="text-[11px] text-slate-400 mt-0.5">{{ $order->created_at->format('d/m/Y H:i') }}</p>
-                            </td>
-
-                            <!-- Recipient -->
-                            <td class="py-4 px-4">
-                                <div class="font-bold text-slate-800">{{ $order->receiver_name }}</div>
-                                <div class="text-[11px] text-slate-500 font-mono">{{ $order->receiver_phone }}</div>
-                                <p class="text-[11px] text-slate-400 truncate max-w-[200px]" title="{{ $order->shipping_address }}">
-                                    {{ $order->shipping_address }}
-                                </p>
-                            </td>
-
-                            <!-- Products preview -->
-                            <td class="py-4 px-4">
-                                <span class="font-bold text-slate-800">{{ $order->items->count() }} sản phẩm</span>
-                                <div class="text-[11px] text-slate-500 truncate max-w-[220px] mt-0.5" title="{{ $order->items->pluck('product_name')->implode(', ') }}">
-                                    {{ $order->items->first()?->product_name }}
-                                    @if($order->items->count() > 1)
-                                        <span class="text-primary font-semibold">(+{{ $order->items->count() - 1 }})</span>
-                                    @endif
-                                </div>
                             </td>
 
                             <!-- Total Amount -->
@@ -244,7 +222,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-12 text-center text-slate-400">
+                            <td colspan="5" class="py-12 text-center text-slate-400">
                                 <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
                                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/></svg>
                                 </div>

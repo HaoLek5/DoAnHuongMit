@@ -1,10 +1,20 @@
 @extends('layouts.admin')
 
-@section('title', 'Chỉnh sửa Chiến dịch Sale - Hương Mít')
-@section('page_title', 'Chỉnh sửa chiến dịch sale')
+@section('title', ($campaign->isEnded() ? 'Chi tiết Chiến dịch Sale' : 'Chỉnh sửa Chiến dịch Sale') . ' - Hương Mít')
+@section('page_title', $campaign->isEnded() ? 'Chi tiết chiến dịch sale (Đã kết thúc)' : 'Chỉnh sửa chiến dịch sale')
 
 @section('content')
 <div class="space-y-6" x-data="saleCampaignEditForm()">
+
+    {{-- End of Campaign Readonly Notice --}}
+    @if($campaign->isEnded())
+        <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-800 flex items-center gap-2.5 shadow-xs">
+            <svg class="w-4 h-4 text-amber-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Chiến dịch này đã kết thúc vào {{ $campaign->end_time->format('d/m/Y H:i') }}. Chế độ chỉ xem, trạng thái đã khóa và không thể chỉnh sửa.</span>
+        </div>
+    @endif
 
     {{-- Breadcrumb & Back --}}
     <div class="flex items-center justify-between">
@@ -47,37 +57,37 @@
 
                 {{-- Campaign Name --}}
                 <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tên chiến dịch <span class="text-rose-500">*</span></label>
-                    <input type="text" x-model="form.name" required
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tên chiến dịch <span class="text-rose-500" x-show="!isReadonly">*</span></label>
+                    <input type="text" x-model="form.name" required :disabled="isReadonly"
                            placeholder="VD: Flash Sale Giờ Vàng 11.11"
-                           class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                           class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
                 </div>
 
                 {{-- Description --}}
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Mô tả / Ghi chú</label>
-                    <textarea x-model="form.description" rows="3"
+                    <textarea x-model="form.description" rows="3" :disabled="isReadonly"
                               placeholder="Mô tả quyền lợi hoặc ghi chú nội bộ về chiến dịch..."
-                              class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"></textarea>
+                              class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"></textarea>
                 </div>
 
                 {{-- Time Range --}}
                 <div class="space-y-4 pt-1 border-t border-slate-100">
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-xs font-bold text-slate-700">Thời gian bắt đầu <span class="text-rose-500">*</span></label>
-                            <button type="button" @click="setStartNow()" class="text-[10px] font-bold text-primary hover:underline">
+                            <label class="text-xs font-bold text-slate-700">Thời gian bắt đầu <span class="text-rose-500" x-show="!isReadonly">*</span></label>
+                            <button type="button" @click="setStartNow()" x-show="!isReadonly" class="text-[10px] font-bold text-primary hover:underline">
                                 Bắt đầu ngay
                             </button>
                         </div>
-                        <input type="datetime-local" x-model="form.start_time" required
-                               class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                        <input type="datetime-local" x-model="form.start_time" required :disabled="isReadonly"
+                               class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
-                            <label class="text-xs font-bold text-slate-700">Thời gian kết thúc <span class="text-rose-500">*</span></label>
-                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-primary">
+                            <label class="text-xs font-bold text-slate-700">Thời gian kết thúc <span class="text-rose-500" x-show="!isReadonly">*</span></label>
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-primary" x-show="!isReadonly">
                                 <button type="button" @click="addHoursToEnd(2)" class="hover:underline">+2h</button>
                                 <span>•</span>
                                 <button type="button" @click="addDaysToEnd(1)" class="hover:underline">+1 ngày</button>
@@ -85,8 +95,8 @@
                                 <button type="button" @click="addDaysToEnd(3)" class="hover:underline">+3 ngày</button>
                             </div>
                         </div>
-                        <input type="datetime-local" x-model="form.end_time" required
-                               class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                        <input type="datetime-local" x-model="form.end_time" required :disabled="isReadonly"
+                               class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed">
                     </div>
                 </div>
 
@@ -94,10 +104,11 @@
                 <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
                     <div>
                         <span class="text-xs font-bold text-slate-700 block">Kích hoạt chiến dịch</span>
-                        <span class="text-[11px] text-slate-400 block">Tự động mở bán khi đến giờ bắt đầu</span>
+                        <span class="text-[11px] text-slate-400 block" x-show="!isReadonly">Tự động mở bán khi đến giờ bắt đầu</span>
+                        <span class="text-[11px] text-slate-400 block" x-show="isReadonly">Chiến dịch đã kết thúc (khóa tắt)</span>
                     </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="form.is_active" class="sr-only peer">
+                    <label class="relative inline-flex items-center" :class="isReadonly ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'">
+                        <input type="checkbox" x-model="form.is_active" :disabled="isReadonly" class="sr-only peer">
                         <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
                     </label>
                 </div>
@@ -114,7 +125,7 @@
                     </div>
 
                     {{-- Add Product Button --}}
-                    <button type="button" @click="openProductPicker()"
+                    <button type="button" @click="openProductPicker()" x-show="!isReadonly"
                             class="px-4 py-2 rounded-2xl bg-primary text-white text-xs font-bold hover:bg-primary-600 shadow-xs flex items-center gap-1.5 transition-all">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -131,8 +142,8 @@
                         </svg>
                     </div>
                     <div class="font-bold text-slate-700 text-xs mb-1">Chưa có sản phẩm nào được chọn</div>
-                    <p class="text-[11px] text-slate-400 mb-3">Bấm nút "Thêm sản phẩm sale" ở trên để chọn các mặt hàng giảm giá.</p>
-                    <button type="button" @click="openProductPicker()" class="px-4 py-2 rounded-xl border border-primary text-primary text-xs font-bold hover:bg-primary-50">
+                    <p class="text-[11px] text-slate-400 mb-3" x-show="!isReadonly">Bấm nút "Thêm sản phẩm sale" ở trên để chọn các mặt hàng giảm giá.</p>
+                    <button type="button" @click="openProductPicker()" x-show="!isReadonly" class="px-4 py-2 rounded-xl border border-primary text-primary text-xs font-bold hover:bg-primary-50">
                         + Chọn sản phẩm ngay
                     </button>
                 </div>
@@ -148,7 +159,7 @@
                                 <th class="py-3 px-3 w-36 text-left">Giá Sale (VNĐ)</th>
                                 <th class="py-3 px-3 w-28 text-center">Số lượng Sale</th>
                                 <th class="py-3 px-3 text-center">Đã bán</th>
-                                <th class="py-3 px-2 text-center w-12">Xóa</th>
+                                <th class="py-3 px-2 text-center w-12" x-show="!isReadonly">Xóa</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -194,8 +205,9 @@
                                             <input type="text" 
                                                    :value="formatNumber(it.sale_price)" 
                                                    @input="onSalePriceInput(it, $event)"
+                                                   :disabled="isReadonly"
                                                    placeholder="VD: 350.000"
-                                                   class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-extrabold text-primary outline-none focus:ring-1 focus:ring-primary focus:border-primary">
+                                                   class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-extrabold text-primary outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:bg-slate-50 disabled:cursor-not-allowed">
                                             
                                             {{-- Discount badge --}}
                                             <div class="flex items-center justify-between text-[10px] mt-1">
@@ -213,9 +225,10 @@
                                     <td class="py-3 px-3">
                                         <div>
                                             <input type="number" x-model.number="it.sale_quantity" min="1" :max="it.stock_quantity"
+                                                   :disabled="isReadonly"
                                                    placeholder="10"
-                                                   class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-center text-slate-800 outline-none focus:ring-1 focus:ring-primary focus:border-primary">
-                                            <div class="text-[10px] text-slate-400 text-center mt-1">
+                                                   class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-center text-slate-800 outline-none focus:ring-1 focus:ring-primary focus:border-primary disabled:bg-slate-50 disabled:cursor-not-allowed">
+                                            <div class="text-[10px] text-slate-400 text-center mt-1" x-show="!isReadonly">
                                                 Tối đa: <strong x-text="it.stock_quantity"></strong>
                                             </div>
                                         </div>
@@ -228,7 +241,7 @@
                                     </td>
 
                                     {{-- Remove --}}
-                                    <td class="py-3 px-2 text-center">
+                                    <td class="py-3 px-2 text-center" x-show="!isReadonly">
                                         <button type="button" @click="removeItem(idx)" 
                                                 title="Xóa mặt hàng này khỏi chiến dịch"
                                                 class="w-7 h-7 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 flex items-center justify-center transition-colors">
@@ -247,10 +260,11 @@
                 <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
                     <a href="{{ route('admin.sale-campaigns.index') }}" 
                        class="px-5 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold transition-all">
-                        Hủy bỏ
+                        <span x-show="!isReadonly">Hủy bỏ</span>
+                        <span x-show="isReadonly">Quay lại danh sách</span>
                     </a>
 
-                    <button type="submit" :disabled="isSubmitting || items.length === 0"
+                    <button type="submit" x-show="!isReadonly" :disabled="isSubmitting || items.length === 0"
                             class="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-primary to-rose-500 hover:from-primary-600 hover:to-rose-600 text-white text-xs font-bold shadow-md shadow-primary/20 transition-all disabled:opacity-50">
                         <span x-show="!isSubmitting">Cập nhật chiến dịch sale</span>
                         <span x-show="isSubmitting">Đang lưu dữ liệu...</span>
@@ -402,6 +416,7 @@ function saleCampaignEditForm() {
         pickerSearch: '',
         isSubmitting: false,
         errorMessage: '',
+        isReadonly: {{ $campaign->isEnded() ? 'true' : 'false' }},
 
         form: {
             id: rawCampaign.id,
@@ -415,22 +430,22 @@ function saleCampaignEditForm() {
         items: initialItems,
 
         get campaignStatusLabel() {
-            if (!this.form.is_active) return 'Đang tạm dừng';
             const now = new Date();
             const start = new Date(this.form.start_time);
             const end = new Date(this.form.end_time);
+            if (now > end || this.isReadonly) return 'Đã kết thúc';
+            if (!this.form.is_active) return 'Đang tạm dừng';
             if (now < start) return 'Sắp diễn ra';
-            if (now > end) return 'Đã kết thúc';
-            return '🔥 Đang diễn ra';
+            return 'Đang diễn ra';
         },
 
         get campaignStatusClass() {
-            if (!this.form.is_active) return 'bg-rose-100 text-rose-800 border-rose-200';
             const now = new Date();
             const start = new Date(this.form.start_time);
             const end = new Date(this.form.end_time);
+            if (now > end || this.isReadonly) return 'bg-slate-100 text-slate-700 border-slate-200';
+            if (!this.form.is_active) return 'bg-rose-100 text-rose-800 border-rose-200';
             if (now < start) return 'bg-blue-100 text-blue-800 border-blue-200';
-            if (now > end) return 'bg-slate-100 text-slate-700 border-slate-200';
             return 'bg-emerald-100 text-emerald-800 border-emerald-200';
         },
 
@@ -531,6 +546,7 @@ function saleCampaignEditForm() {
         },
 
         async submitForm() {
+            if (this.isReadonly) return;
             this.errorMessage = '';
 
             if (!this.form.name.trim()) {

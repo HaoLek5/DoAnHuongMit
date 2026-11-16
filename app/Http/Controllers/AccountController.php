@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
 class AccountController extends Controller
@@ -42,23 +41,19 @@ class AccountController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\-\+\(\)\s]*$/'],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),
-            ],
+            'email' => ['nullable', 'string'],
         ], [
             'name.required' => 'Vui lòng nhập họ và tên của bạn.',
             'name.max' => 'Họ và tên không được vượt quá 255 ký tự.',
-            'email.required' => 'Vui lòng nhập địa chỉ email.',
-            'email.email' => 'Địa chỉ email không đúng định dạng.',
-            'email.unique' => 'Địa chỉ email này đã được sử dụng bởi tài khoản khác.',
             'phone.regex' => 'Số điện thoại chứa ký tự không hợp lệ.',
             'phone.max' => 'Số điện thoại không được vượt quá 20 ký tự.',
         ]);
 
-        $user->update($validated);
+        // Email không thể chỉnh sửa từ trang cá nhân, chỉ cập nhật họ tên và số điện thoại
+        $user->update([
+            'name' => $validated['name'],
+            'phone' => $validated['phone'] ?? null,
+        ]);
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -111,7 +106,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Đổi mật khẩu tài khoản (yêu cầu mã xác thực OTP từ email)
+     * Đổi mật khẩu tài khoản (sử dụng mã xác thực OTP từ email như quy trình đặt lại mật khẩu)
      */
     public function updatePassword(Request $request)
     {
@@ -119,27 +114,19 @@ class AccountController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'current_password' => ['required', 'string'],
             'verification_code' => ['required', 'string', 'size:6'],
-            'password' => ['required', 'string', 'confirmed', Password::min(6)],
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
         ], [
-            'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
-            'verification_code.required' => 'Vui lòng nhập mã xác thực đã gửi về email.',
-            'verification_code.size' => 'Mã xác thực gồm 6 chữ số.',
+            'verification_code.required' => 'Vui lòng nhập mã xác thực OTP đã gửi về email.',
+            'verification_code.size' => 'Mã xác thực gồm đúng 6 chữ số.',
             'password.required' => 'Vui lòng nhập mật khẩu mới.',
-            'password.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
-            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm cả chữ và số.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
         ]);
-
-        if (! Hash::check($validated['current_password'], $user->password)) {
-            return back()
-                ->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.'])
-                ->withInput($request->except('password', 'password_confirmation'));
-        }
 
         if (! EmailVerification::verify($user->email, $validated['verification_code'], 'change_password')) {
             return back()
-                ->withErrors(['verification_code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng bấm "Lấy mã xác thực" để nhận mã mới.'])
+                ->withErrors(['verification_code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng bấm "Gửi mã xác thực" để nhận mã mới.'])
                 ->withInput($request->except('password', 'password_confirmation', 'verification_code'));
         }
 

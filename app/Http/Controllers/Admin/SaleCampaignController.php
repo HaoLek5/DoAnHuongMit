@@ -29,7 +29,7 @@ class SaleCampaignController extends Controller
             'running' => $allCampaigns->where('is_active', true)->filter(fn ($c) => $now->between($c->start_time, $c->end_time))->count(),
             'upcoming' => $allCampaigns->where('is_active', true)->filter(fn ($c) => $now->lt($c->start_time))->count(),
             'ended' => $allCampaigns->filter(fn ($c) => $now->gt($c->end_time))->count(),
-            'paused' => $allCampaigns->where('is_active', false)->count(),
+            'paused' => $allCampaigns->where('is_active', false)->filter(fn ($c) => $now->lte($c->end_time))->count(),
         ];
 
         $query = SaleCampaign::with([
@@ -49,7 +49,8 @@ class SaleCampaignController extends Controller
         } elseif ($status === 'ended') {
             $query->where('end_time', '<', $now);
         } elseif ($status === 'paused') {
-            $query->where('is_active', false);
+            $query->where('is_active', false)
+                ->where('end_time', '>=', $now);
         }
 
         // Search by name
@@ -200,6 +201,17 @@ class SaleCampaignController extends Controller
      */
     public function update(Request $request, SaleCampaign $saleCampaign)
     {
+        if ($saleCampaign->isEnded()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Chiến dịch này đã kết thúc, không thể chỉnh sửa.',
+                ], 422);
+            }
+
+            return back()->with('error', 'Chiến dịch này đã kết thúc, không thể chỉnh sửa.');
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
@@ -296,6 +308,18 @@ class SaleCampaignController extends Controller
      */
     public function destroy(SaleCampaign $saleCampaign)
     {
+        if ($saleCampaign->hasStartedOrRunning()) {
+            $msg = 'Không thể xóa chiến dịch đã hoặc đang diễn ra.';
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 422);
+            }
+
+            return back()->with('error', $msg);
+        }
+
         try {
             $name = $saleCampaign->name;
             $saleCampaign->delete();
@@ -325,6 +349,13 @@ class SaleCampaignController extends Controller
      */
     public function toggleStatus(SaleCampaign $saleCampaign): JsonResponse
     {
+        if ($saleCampaign->isEnded()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Chiến dịch đã kết thúc, trạng thái được khóa là tắt.',
+            ], 422);
+        }
+
         try {
             $saleCampaign->is_active = ! $saleCampaign->is_active;
             $saleCampaign->save();

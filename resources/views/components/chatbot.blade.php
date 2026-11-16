@@ -1,12 +1,15 @@
 {{-- ── HƯƠNG MÍT PRODUCT RECOMMENDATION CHATBOT ── --}}
-<div x-data="haomilkChatbot()" x-init="init()" class="relative z-50">
+<div x-data="haomilkChatbot()" x-init="init()" class="relative z-40">
 
     {{-- ── FLOATING TRIGGER BUTTON & SPEECH BUBBLE ── --}}
     <div class="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 flex items-end gap-2.5"
-         x-show="!isOpen"
+         x-show="!isOpen && !cartDrawerOpen"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 scale-90"
-         x-transition:enter-end="opacity-100 translate-y-0 scale-100">
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 scale-90">
 
         <!-- Dismissible speech bubble teaser -->
         <div x-show="showTeaser" 
@@ -44,7 +47,7 @@
     </div>
 
     {{-- ── EXPANDED CHAT WINDOW ── --}}
-    <div x-show="isOpen" 
+    <div x-show="isOpen && !cartDrawerOpen" 
          x-cloak
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-6 scale-95"
@@ -52,7 +55,7 @@
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-6 scale-95"
-         class="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-50 w-[94vw] sm:w-[420px] h-[580px] max-h-[88vh] bg-white rounded-3xl shadow-2xl border border-primary-100 flex flex-col overflow-hidden">
+         class="fixed bottom-4 right-3 sm:bottom-6 sm:right-6 z-40 w-[94vw] sm:w-[420px] h-[580px] max-h-[88vh] bg-white rounded-3xl shadow-2xl border border-primary-100 flex flex-col overflow-hidden">
         
         <!-- Header -->
         <div class="px-5 py-4 bg-gradient-to-r from-primary via-primary-600 to-rose-500 text-white flex items-center justify-between shadow-xs">

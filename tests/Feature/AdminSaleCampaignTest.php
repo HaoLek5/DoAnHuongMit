@@ -243,4 +243,112 @@ class AdminSaleCampaignTest extends TestCase
         $campaign->refresh();
         $this->assertFalse($campaign->is_active);
     }
+
+    public function test_admin_cannot_edit_ended_sale_campaign(): void
+    {
+        $campaign = SaleCampaign::create([
+            'name' => 'Chiến dịch Đã Kết Thúc',
+            'start_time' => now()->subDays(3),
+            'end_time' => now()->subDay(),
+            'is_active' => true,
+        ]);
+
+        $payload = [
+            'name' => 'Tên mới muốn sửa',
+            'start_time' => now()->subDays(3)->format('Y-m-d\TH:i'),
+            'end_time' => now()->subDay()->format('Y-m-d\TH:i'),
+            'items' => [
+                [
+                    'product_id' => $this->product->id,
+                    'product_variant_id' => $this->variant->id,
+                    'sale_price' => 300000,
+                    'sale_quantity' => 10,
+                ],
+            ],
+        ];
+
+        $response = $this->actingAs($this->admin)
+            ->putJson(route('admin.sale-campaigns.update', $campaign), $payload);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Chiến dịch này đã kết thúc, không thể chỉnh sửa.',
+        ]);
+    }
+
+    public function test_admin_cannot_toggle_ended_sale_campaign(): void
+    {
+        $campaign = SaleCampaign::create([
+            'name' => 'Chiến dịch Đã Kết Thúc Không Được Bật',
+            'start_time' => now()->subDays(2),
+            'end_time' => now()->subHour(),
+            'is_active' => false,
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->postJson(route('admin.sale-campaigns.toggle-status', $campaign));
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'success' => false,
+            'message' => 'Chiến dịch đã kết thúc, trạng thái được khóa là tắt.',
+        ]);
+    }
+
+    public function test_admin_cannot_delete_running_or_ended_sale_campaign(): void
+    {
+        // 1. Đang diễn ra
+        $runningCampaign = SaleCampaign::create([
+            'name' => 'Sale Đang Diễn Ra',
+            'start_time' => now()->subHour(),
+            'end_time' => now()->addHours(2),
+            'is_active' => true,
+        ]);
+
+        $responseRunning = $this->actingAs($this->admin)
+            ->deleteJson(route('admin.sale-campaigns.destroy', $runningCampaign));
+
+        $responseRunning->assertStatus(422);
+        $responseRunning->assertJson([
+            'success' => false,
+            'message' => 'Không thể xóa chiến dịch đã hoặc đang diễn ra.',
+        ]);
+        $this->assertDatabaseHas('sale_campaigns', ['id' => $runningCampaign->id]);
+
+        // 2. Đã diễn ra / đã kết thúc
+        $endedCampaign = SaleCampaign::create([
+            'name' => 'Sale Đã Kết Thúc',
+            'start_time' => now()->subDays(2),
+            'end_time' => now()->subDay(),
+            'is_active' => false,
+        ]);
+
+        $responseEnded = $this->actingAs($this->admin)
+            ->deleteJson(route('admin.sale-campaigns.destroy', $endedCampaign));
+
+        $responseEnded->assertStatus(422);
+        $responseEnded->assertJson([
+            'success' => false,
+            'message' => 'Không thể xóa chiến dịch đã hoặc đang diễn ra.',
+        ]);
+        $this->assertDatabaseHas('sale_campaigns', ['id' => $endedCampaign->id]);
+    }
+
+    public function test_admin_can_delete_upcoming_sale_campaign(): void
+    {
+        $upcomingCampaign = SaleCampaign::create([
+            'name' => 'Sale Sắp Diễn Ra Trong Tương Lai',
+            'start_time' => now()->addDays(2),
+            'end_time' => now()->addDays(4),
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->deleteJson(route('admin.sale-campaigns.destroy', $upcomingCampaign));
+
+        $response->assertStatus(200);
+        $response->assertJson(['success' => true]);
+        $this->assertDatabaseMissing('sale_campaigns', ['id' => $upcomingCampaign->id]);
+    }
 }

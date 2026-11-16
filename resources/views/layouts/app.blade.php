@@ -348,7 +348,7 @@
     {{-- ── SLIDE-OVER CART DRAWER ── --}}
     <div x-show="cartDrawerOpen" 
          x-cloak
-         class="fixed inset-0 z-50 overflow-hidden" 
+         class="fixed inset-0 z-[70] overflow-hidden" 
          aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
         
         <!-- Backdrop -->

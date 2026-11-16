@@ -4,7 +4,7 @@
 @section('page_title', 'Chiến dịch Sale')
 
 @section('content')
-<div class="space-y-6" x-data="saleCampaignManager()">
+<div class="space-y-5" x-data="saleCampaignManager()">
 
     {{-- Alert Notifications --}}
     @if(session('success'))
@@ -25,57 +25,6 @@
         </div>
     @endif
 
-    {{-- Top Overview Stats --}}
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-                </svg>
-            </div>
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Tổng chiến dịch</span>
-                <span class="text-xl font-extrabold text-slate-800">{{ $counts['total'] }}</span>
-            </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                </svg>
-            </div>
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Đang diễn ra</span>
-                <span class="text-xl font-extrabold text-emerald-600">{{ $counts['running'] }}</span>
-            </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Sắp diễn ra</span>
-                <span class="text-xl font-extrabold text-blue-600">{{ $counts['upcoming'] }}</span>
-            </div>
-        </div>
-
-        <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Đang tạm dừng</span>
-                <span class="text-xl font-extrabold text-rose-600">{{ $counts['paused'] }}</span>
-            </div>
-        </div>
-    </div>
-
     {{-- Main Container Card --}}
     <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden space-y-4">
 
@@ -92,12 +41,12 @@
 
                 <a href="{{ route('admin.sale-campaigns.index', array_merge(request()->except(['page']), ['status' => 'running'])) }}"
                    class="px-4 py-2 rounded-xl transition-all whitespace-nowrap {{ $curStatus === 'running' ? 'bg-emerald-600 text-white shadow-xs font-bold' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' }}">
-                    🔥 Đang diễn ra ({{ $counts['running'] }})
+                    Đang diễn ra ({{ $counts['running'] }})
                 </a>
 
                 <a href="{{ route('admin.sale-campaigns.index', array_merge(request()->except(['page']), ['status' => 'upcoming'])) }}"
                    class="px-4 py-2 rounded-xl transition-all whitespace-nowrap {{ $curStatus === 'upcoming' ? 'bg-blue-600 text-white shadow-xs font-bold' : 'bg-blue-50 text-blue-700 hover:bg-blue-100' }}">
-                    ⏰ Sắp diễn ra ({{ $counts['upcoming'] }})
+                    Sắp diễn ra ({{ $counts['upcoming'] }})
                 </a>
 
                 <a href="{{ route('admin.sale-campaigns.index', array_merge(request()->except(['page']), ['status' => 'ended'])) }}"
@@ -138,7 +87,7 @@
                     <input type="text" 
                            name="search" 
                            value="{{ request('search') }}" 
-                           placeholder="Tìm kiếm theo Tên chiến dịch hoặc Mô tả..." 
+                           placeholder="Tìm theo tên chiến dịch hoặc mô tả..." 
                            class="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                 </div>
 
@@ -187,6 +136,8 @@
                             $totalSaleQty = $camp->items->sum('sale_quantity');
                             $totalSoldQty = $camp->items->sum('sold_quantity');
                             $progressPct = $totalSaleQty > 0 ? min(100, round(($totalSoldQty / $totalSaleQty) * 100)) : 0;
+                            $isEnded = $camp->isEnded();
+                            $hasStarted = $camp->hasStartedOrRunning();
                         @endphp
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             {{-- Campaign Name & Description --}}
@@ -201,16 +152,8 @@
 
                             {{-- Time Schedule --}}
                             <td class="py-4 px-4 whitespace-nowrap">
-                                <div class="space-y-1">
-                                    <div class="flex items-center gap-1.5 text-xs text-slate-700 font-semibold">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                        <span>Bắt đầu: {{ $camp->start_time->format('d/m/Y H:i') }}</span>
-                                    </div>
-                                    <div class="flex items-center gap-1.5 text-xs text-slate-500">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-                                        <span>Kết thúc: {{ $camp->end_time->format('d/m/Y H:i') }}</span>
-                                    </div>
-                                </div>
+                                <div class="text-xs font-semibold text-slate-800">{{ $camp->start_time->format('d/m/Y H:i') }}</div>
+                                <div class="text-[11px] text-slate-400">đến {{ $camp->end_time->format('d/m/Y H:i') }}</div>
                             </td>
 
                             {{-- Products Count --}}
@@ -236,73 +179,94 @@
                             {{-- Status Badge --}}
                             <td class="py-4 px-4 text-center whitespace-nowrap">
                                 @if($camp->status === 'running')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                        <span>🔥 Đang diễn ra</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        Đang diễn ra
                                     </span>
                                 @elseif($camp->status === 'upcoming')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-                                        <span>⏰ Sắp diễn ra</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                        Sắp diễn ra
                                     </span>
                                 @elseif($camp->status === 'ended')
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                                        <span>Đã kết thúc</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        Đã kết thúc
                                     </span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
-                                        <span>Đã tạm dừng</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                        Đã tạm dừng
                                     </span>
                                 @endif
                             </td>
 
                             {{-- Toggle Active Switch --}}
                             <td class="py-4 px-4 text-center whitespace-nowrap">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" 
-                                           {{ $camp->is_active ? 'checked' : '' }} 
-                                           @change="toggleCampaign({{ $camp->id }}, $event.target)"
-                                           class="sr-only peer">
-                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
-                                </label>
+                                @if($isEnded)
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed select-none" title="Chiến dịch đã kết thúc (khóa tắt)">
+                                        Khóa tắt
+                                    </span>
+                                @else
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" 
+                                               {{ $camp->is_active ? 'checked' : '' }} 
+                                               @change="toggleCampaign({{ $camp->id }}, $event.target)"
+                                               class="sr-only peer">
+                                        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                @endif
                             </td>
 
                             {{-- Actions --}}
                             <td class="py-4 px-6 text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <!-- Edit Button -->
-                                    <a href="{{ route('admin.sale-campaigns.edit', $camp) }}"
-                                       title="Chỉnh sửa chiến dịch"
-                                       class="p-2 rounded-xl text-slate-400 hover:text-primary hover:bg-primary-50 transition-all">
-                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </a>
+                                    @if($isEnded)
+                                        <!-- View Detail Only Button -->
+                                        <a href="{{ route('admin.sale-campaigns.edit', $camp) }}"
+                                           title="Xem chi tiết (Chiến dịch đã kết thúc)"
+                                           class="p-2 rounded-xl text-slate-400 hover:text-primary hover:bg-primary-50 transition-all">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                            </svg>
+                                        </a>
+                                    @else
+                                        <!-- Edit Button -->
+                                        <a href="{{ route('admin.sale-campaigns.edit', $camp) }}"
+                                           title="Chỉnh sửa chiến dịch"
+                                           class="p-2 rounded-xl text-slate-400 hover:text-primary hover:bg-primary-50 transition-all">
+                                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                        </a>
+                                    @endif
 
                                     <!-- Delete Button -->
-                                    <form method="POST" action="{{ route('admin.sale-campaigns.destroy', $camp) }}"
-                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa chiến dịch sale [{{ $camp->name }}] không?');"
-                                          class="inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                title="Xóa chiến dịch"
-                                                class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all">
+                                    @if($hasStarted)
+                                        <span title="Không thể xóa chiến dịch đã hoặc đang diễn ra" 
+                                              class="p-2 rounded-xl text-slate-200 cursor-not-allowed inline-block">
                                             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                             </svg>
-                                        </button>
-                                    </form>
+                                        </span>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.sale-campaigns.destroy', $camp) }}"
+                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa chiến dịch sale [{{ $camp->name }}] không?');"
+                                              class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" 
+                                                    title="Xóa chiến dịch"
+                                                    class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all">
+                                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="7" class="py-12 text-center text-slate-400">
-                                <div class="w-12 h-12 mx-auto mb-3 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-                                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                                    </svg>
-                                </div>
                                 <div class="font-bold text-slate-700 text-sm mb-1">Chưa có chiến dịch sale nào</div>
                                 <p class="text-xs text-slate-400 max-w-sm mx-auto mb-4">Hãy tạo chiến dịch sale đầu tiên để kích cầu mua sắm và áp dụng mức giá ưu đãi trong khung giờ vàng!</p>
                                 <a href="{{ route('admin.sale-campaigns.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary-600 transition-all">
@@ -357,4 +321,3 @@ function saleCampaignManager() {
 }
 </script>
 @endpush
-
