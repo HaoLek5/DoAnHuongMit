@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailVerificationMail;
 use App\Models\Address;
+use App\Models\EmailVerification;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -11,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 
@@ -21,9 +24,11 @@ class AccountController extends Controller
      */
     public function profile()
     {
+        /** @var User $user */
         $user = Auth::user();
+        $passwordCodeSeconds = EmailVerification::secondsUntilResend($user->email, 'change_password');
 
-        return view('account.profile', compact('user'));
+        return view('account.profile', compact('user', 'passwordCodeSeconds'));
     }
 
     /**
@@ -67,7 +72,46 @@ class AccountController extends Controller
     }
 
     /**
-     * Đổi mật khẩu tài khoản
+     * Gửi mã OTP xác thực qua email trước khi đổi mật khẩu
+     */
+    public function sendPasswordVerificationCode(Request $request): JsonResponse|RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (! EmailVerification::canResend($user->email, 'change_password')) {
+            $seconds = EmailVerification::secondsUntilResend($user->email, 'change_password');
+            $msg = "Vui lòng đợi {$seconds} giây trước khi yêu cầu mã mới.";
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                    'seconds' => $seconds,
+                ], 429);
+            }
+
+            return back()->withErrors(['verification_code' => $msg]);
+        }
+
+        $code = EmailVerification::generate($user->email, 'change_password');
+        Mail::to($user->email)->send(new EmailVerificationMail($code, 'change_password', $user->name));
+
+        $msg = "Mã xác thực 6 số đã được gửi tới email {$user->email}. Mã có hiệu lực trong vòng 15 phút.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'seconds' => 60,
+            ]);
+        }
+
+        return back()->with('password_code_sent', $msg);
+    }
+
+    /**
+     * Đổi mật khẩu tài khoản (yêu cầu mã xác thực OTP từ email)
      */
     public function updatePassword(Request $request)
     {
@@ -76,9 +120,12 @@ class AccountController extends Controller
 
         $validated = $request->validate([
             'current_password' => ['required', 'string'],
+            'verification_code' => ['required', 'string', 'size:6'],
             'password' => ['required', 'string', 'confirmed', Password::min(6)],
         ], [
             'current_password.required' => 'Vui lòng nhập mật khẩu hiện tại.',
+            'verification_code.required' => 'Vui lòng nhập mã xác thực đã gửi về email.',
+            'verification_code.size' => 'Mã xác thực gồm 6 chữ số.',
             'password.required' => 'Vui lòng nhập mật khẩu mới.',
             'password.min' => 'Mật khẩu mới phải có ít nhất 6 ký tự.',
             'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
@@ -87,7 +134,13 @@ class AccountController extends Controller
         if (! Hash::check($validated['current_password'], $user->password)) {
             return back()
                 ->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.'])
-                ->withInput();
+                ->withInput($request->except('password', 'password_confirmation'));
+        }
+
+        if (! EmailVerification::verify($user->email, $validated['verification_code'], 'change_password')) {
+            return back()
+                ->withErrors(['verification_code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng bấm "Lấy mã xác thực" để nhận mã mới.'])
+                ->withInput($request->except('password', 'password_confirmation', 'verification_code'));
         }
 
         $user->update([

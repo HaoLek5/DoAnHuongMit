@@ -11,6 +11,16 @@
         <p class="text-sm text-gray-500">Đăng nhập để tiếp tục mua sắm cùng Hương Mít.</p>
     </div>
 
+    {{-- Success Alert --}}
+    @if(session('success'))
+    <div class="flex items-start gap-3 p-4 mb-5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800">
+        <svg class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ session('success') }}</span>
+    </div>
+    @endif
+
     {{-- Global Error Alert --}}
     @if($errors->any())
     <div id="login-error-alert" class="flex items-start gap-3 p-4 mb-5 rounded-2xl bg-red-50 border border-red-200 shake">
@@ -94,13 +104,18 @@
             @enderror
         </div>
 
-        {{-- Remember me --}}
-        <div class="flex items-center mb-6">
-            <input id="remember" name="remember" type="checkbox"
-                class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer">
-            <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer select-none">
-                Ghi nhớ đăng nhập
-            </label>
+        {{-- Remember me & Forgot password --}}
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center">
+                <input id="remember" name="remember" type="checkbox"
+                    class="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer">
+                <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer select-none">
+                    Ghi nhớ đăng nhập
+                </label>
+            </div>
+            <a href="{{ route('auth.forgot-password') }}" class="text-xs font-semibold text-primary hover:text-primary-700 transition-colors">
+                Quên mật khẩu?
+            </a>
         </div>
 
         {{-- Submit --}}

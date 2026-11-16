@@ -12,11 +12,12 @@ class UserSeeder extends Seeder
     {
         // Admin account
         User::updateOrCreate(
-            ['email' => 'admin@haomilk.vn'],
+            ['email' => 'haopak2k5@gmail.com'],
             [
                 'name' => 'Admin',
                 'password' => Hash::make('Admin@12345'),
                 'role' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
 
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder
                 'phone' => '0912345678',
                 'password' => Hash::make('Khach@12345'),
                 'role' => 'customer',
+                'email_verified_at' => now(),
             ]
         );
     }

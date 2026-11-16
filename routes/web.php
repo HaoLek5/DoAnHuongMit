@@ -43,11 +43,40 @@ Route::middleware('guest')->group(function () {
     Route::post('/dang-ky', [AuthController::class, 'register'])
         ->middleware('throttle:register')
         ->name('auth.register.post');
+
+    // Quên / Đặt lại mật khẩu khi chưa đăng nhập
+    Route::get('/quen-mat-khau', [AuthController::class, 'showForgotPassword'])->name('auth.forgot-password');
+    Route::post('/quen-mat-khau', [AuthController::class, 'sendResetOtp'])
+        ->middleware('throttle:6,1')
+        ->name('auth.forgot-password.send');
+    Route::post('/quen-mat-khau/gui-lai', [AuthController::class, 'resendResetOtp'])
+        ->middleware('throttle:6,1')
+        ->name('auth.forgot-password.resend');
+
+    Route::get('/dat-lai-mat-khau', [AuthController::class, 'showResetPassword'])->name('auth.reset-password');
+    Route::post('/dat-lai-mat-khau', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:6,1')
+        ->name('auth.reset-password.post');
+
+    // Route alias chuẩn Laravel cho forgot/reset password
+    Route::get('/forgot-password', fn () => redirect()->route('auth.forgot-password'))->name('password.request');
+    Route::get('/reset-password', fn () => redirect()->route('auth.reset-password'))->name('password.reset');
 });
 
 Route::post('/dang-xuat', [AuthController::class, 'logout'])
     ->name('auth.logout')
     ->middleware('auth');
+
+// ─── Email Verification Routes ───────────────────────────────────────────────
+Route::middleware('auth')->group(function () {
+    Route::get('/xac-thuc-email', [AuthController::class, 'showVerifyEmail'])->name('verification.notice');
+    Route::post('/xac-thuc-email', [AuthController::class, 'verifyEmail'])
+        ->middleware('throttle:6,1')
+        ->name('verification.verify');
+    Route::post('/xac-thuc-email/gui-lai', [AuthController::class, 'resendVerificationEmail'])
+        ->middleware('throttle:6,1')
+        ->name('verification.resend');
+});
 
 // ─── Checkout & Order Placement ─────────────────────────────────────────────
 use App\Http\Controllers\CheckoutController;
@@ -75,6 +104,9 @@ use App\Http\Controllers\AccountController;
 Route::prefix('tai-khoan')->name('account.')->middleware('auth')->group(function () {
     Route::get('/', [AccountController::class, 'profile'])->name('profile');
     Route::put('/thong-tin', [AccountController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/gui-ma-doi-mat-khau', [AccountController::class, 'sendPasswordVerificationCode'])
+        ->middleware('throttle:6,1')
+        ->name('password.send-code');
     Route::put('/doi-mat-khau', [AccountController::class, 'updatePassword'])->name('password.update');
 
     // Addresses
