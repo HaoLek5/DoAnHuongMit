@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Hương Mít - Thiên đường cho Mẹ & Bé yêu')
-@section('meta_description', 'Hương Mít - Cung cấp sữa bột dinh dưỡng, tã bỉm, bình sữa và thực phẩm ăn dặm chính hãng cho mẹ và bé.')
+@section('meta_description', 'Hương Mít - Cung cấp sữa bột dinh dưỡng, tã bỉm, bình sữa và thực phẩm ăn dặm cho mẹ và bé.')
 
 @section('content')
 
@@ -16,7 +16,7 @@
             <div class="lg:col-span-7 space-y-5 text-center lg:text-left">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-primary-200 text-primary text-xs font-bold shadow-xs">
                     <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                    <span>Hàng chính hãng 100% cho Mẹ & Bé</span>
+                    <span>Sản phẩm chất lượng cho Mẹ & Bé</span>
                 </div>
 
                 <h1 class="text-3xl sm:text-5xl lg:text-5xl font-display font-extrabold text-gray-800 leading-tight">
@@ -254,14 +254,10 @@
                             </div>
                         @endif
 
-                        <!-- Product Code or Sale Badge -->
+                        <!-- Sale Badge -->
                         @if($p->active_sale_item)
                             <span class="absolute top-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-xs flex items-center gap-1 animate-pulse">
                                 🔥 SALE -{{ $p->active_sale_item->discount_percent }}%
-                            </span>
-                        @else
-                            <span class="absolute top-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-white/90 backdrop-blur-xs text-primary shadow-xs">
-                                {{ $p->code }}
                             </span>
                         @endif
 

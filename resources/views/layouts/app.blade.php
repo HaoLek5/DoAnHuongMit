@@ -285,7 +285,7 @@
                         <span class="font-display text-xl text-primary-700 font-bold">Hương Mít</span>
                     </div>
                     <p class="text-xs sm:text-sm text-gray-500 max-w-sm leading-relaxed">
-                        Cam kết sản phẩm chính hãng 100%, an toàn tuyệt đối và chăm sóc tận tâm.
+                        Sản phẩm chất lượng cao, an toàn tuyệt đối và chăm sóc tận tâm.
                     </p>
                 </div>
 
@@ -516,67 +516,72 @@
     </div>
 
     {{-- ── REQUIRE LOGIN MODAL ── --}}
-    <div x-show="loginModalOpen"
-         x-cloak
-         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
-        
+    <template x-teleport="body">
         <div x-show="loginModalOpen"
-             x-transition:enter="ease-out duration-200"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             @click="loginModalOpen = false"
-             class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
-
-        <div x-show="loginModalOpen"
-             x-transition:enter="ease-out duration-200"
-             x-transition:enter-start="opacity-0 scale-95"
-             x-transition:enter-end="opacity-100 scale-100"
-             class="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border border-primary-100 z-10">
+             x-cloak
+             class="fixed inset-0 z-[80] overflow-y-auto flex items-center justify-center p-4"
+             role="dialog" aria-modal="true">
             
-            <div class="w-16 h-16 rounded-full bg-primary-100 text-primary flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-            </div>
+            <div x-show="loginModalOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 @click="loginModalOpen = false"
+                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"></div>
 
-            <h3 class="font-bold text-base text-gray-800 font-display mb-1.5">Yêu cầu đăng nhập</h3>
-            <p class="text-xs text-gray-500 mb-6 leading-relaxed" x-text="loginModalMessage"></p>
+            <div x-show="loginModalOpen"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 class="relative bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl border border-primary-100 z-10">
+                
+                <div class="w-16 h-16 rounded-full bg-primary-100 text-primary flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
 
-            <div class="space-y-2">
-                <a :href="'{{ route('auth.login') }}?redirect=' + encodeURIComponent(window.location.href)"
-                   class="block w-full py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all">
-                    Đăng nhập ngay
-                </a>
-                <a href="{{ route('auth.register') }}"
-                   class="block w-full py-2.5 rounded-2xl border border-slate-200 hover:bg-slate-50 text-gray-700 font-bold text-xs transition-colors">
-                    Chưa có tài khoản? Đăng ký
-                </a>
-                <button type="button" @click="loginModalOpen = false"
-                        class="text-[11px] text-gray-400 hover:text-gray-600 pt-2 block mx-auto">
-                    Để sau
-                </button>
+                <h3 class="font-bold text-base text-gray-800 font-display mb-1.5">Yêu cầu đăng nhập</h3>
+                <p class="text-xs text-gray-500 mb-6 leading-relaxed" x-text="loginModalMessage"></p>
+
+                <div class="space-y-2">
+                    <a :href="'{{ route('auth.login') }}?redirect=' + encodeURIComponent(window.location.href)"
+                       class="block w-full py-3 rounded-2xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all">
+                        Đăng nhập ngay
+                    </a>
+                    <a :href="'{{ route('auth.register') }}?redirect=' + encodeURIComponent(window.location.href)"
+                       class="block w-full py-2.5 rounded-2xl border border-slate-200 hover:bg-slate-50 text-gray-700 font-bold text-xs transition-colors">
+                        Chưa có tài khoản? Đăng ký
+                    </a>
+                    <button type="button" @click="loginModalOpen = false"
+                            class="text-[11px] text-gray-400 hover:text-gray-600 pt-2 block mx-auto">
+                        Để sau
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </template>
 
     {{-- ── GLOBAL TOAST NOTIFICATION ── --}}
-    <div x-show="toastVisible"
-         x-cloak
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:translate-x-4"
-         x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed bottom-24 right-5 sm:bottom-28 sm:right-6 z-50 max-w-sm bg-white rounded-2xl shadow-xl border border-primary-200 p-4 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    <template x-teleport="body">
+        <div x-show="toastVisible"
+             x-cloak
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:translate-x-4"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed bottom-24 right-5 sm:bottom-28 sm:right-6 z-[90] max-w-sm bg-white rounded-2xl shadow-xl border border-primary-200 p-4 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <div class="flex-1 text-xs font-semibold text-gray-800" x-text="toastMessage"></div>
+            <button type="button" @click="toastVisible = false" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
         </div>
-        <div class="flex-1 text-xs font-semibold text-gray-800" x-text="toastMessage"></div>
-        <button type="button" @click="toastVisible = false" class="text-gray-400 hover:text-gray-600">
-            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-    </div>
+    </template>
 
     {{-- ── PRODUCT RECOMMENDATION CHATBOT ── --}}
     @include('components.chatbot')

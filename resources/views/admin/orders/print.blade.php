@@ -235,7 +235,7 @@
         <div class="info-grid">
             <div class="info-block">
                 <h3>Người gửi:</h3>
-                <strong>HƯƠNG MÍT CHÍNH HÃNG</strong>
+                <strong>CỬA HÀNG HƯƠNG MÍT</strong>
                 <p>Hotline hỗ trợ: 0900.000.001</p>
                 <p>Hà Nội, Việt Nam</p>
             </div>

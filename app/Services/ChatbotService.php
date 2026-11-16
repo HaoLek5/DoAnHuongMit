@@ -38,7 +38,7 @@ class ChatbotService
             return [
                 'status' => 'success',
                 'is_out_of_scope' => false,
-                'reply' => "Dạ Hương Mít xin chào bạn! 🍼✨\n\nEm là trợ lý ảo chuyên tư vấn sản phẩm cho Mẹ & Bé. Shop hiện đang có sẵn các mặt hàng chính hãng chất lượng cao gồm: {$categories}.\n\nBạn đang cần tìm sản phẩm gì cho bé yêu hoặc mẹ (độ tuổi, cân nặng, tình trạng tiêu hóa, đồ mặc nhà...) để em gợi ý phù hợp nhất ạ?",
+                'reply' => "Dạ Hương Mít xin chào bạn! 🍼✨\n\nEm là trợ lý ảo chuyên tư vấn sản phẩm cho Mẹ & Bé. Shop hiện đang có sẵn các mặt hàng chất lượng cao gồm: {$categories}.\n\nBạn đang cần tìm sản phẩm gì cho bé yêu hoặc mẹ (độ tuổi, cân nặng, tình trạng tiêu hóa, đồ mặc nhà...) để em gợi ý phù hợp nhất ạ?",
                 'products' => [],
                 'suggested_chips' => [],
             ];
