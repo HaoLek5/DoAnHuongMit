@@ -25,16 +25,16 @@
             line-height: 1.5;
         }
         .container {
-            max-width: 800px;
+            max-width: 720px;
             margin: 0 auto;
-            border: 1px dashed #cbd5e1;
-            padding: 32px;
+            border: 1px solid #e2e8f0;
+            padding: 24px 28px;
             border-radius: 12px;
             background: #fff;
         }
         @media screen {
             .order-sheet {
-                margin-bottom: 32px;
+                margin-bottom: 24px;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
             }
         }
@@ -59,15 +59,14 @@
             justify-content: space-between;
             align-items: flex-start;
             border-bottom: 2px solid #0f172a;
-            padding-bottom: 16px;
-            margin-bottom: 20px;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
         }
         .shop-info h1 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 800;
             color: #0f172a;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         .shop-info p {
             font-size: 11px;
@@ -78,59 +77,49 @@
             text-align: right;
         }
         .order-title h2 {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 800;
             color: #e11d48;
         }
         .order-title p {
             font-size: 12px;
-            color: #64748b;
-            font-family: monospace;
+            color: #475569;
             margin-top: 2px;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 24px;
+        .delivery-box {
             background: #f8fafc;
-            padding: 16px;
+            padding: 12px 16px;
             border-radius: 8px;
-            border: 1px solid #f1f5f9;
+            border: 1px solid #edf2f7;
+            margin-bottom: 16px;
+            font-size: 12px;
         }
-        .info-block h3 {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #94a3b8;
-            margin-bottom: 6px;
-            font-weight: 700;
+        .delivery-box-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 4px;
         }
-        .info-block p {
-            font-size: 13px;
-            color: #1e293b;
-        }
-        .info-block strong {
-            font-size: 14px;
-            color: #0f172a;
+        .delivery-box-row:last-child {
+            margin-bottom: 0;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
         }
         th {
             background: #f1f5f9;
             color: #475569;
             text-align: left;
-            padding: 10px 12px;
+            padding: 8px 10px;
             font-size: 11px;
             text-transform: uppercase;
             font-weight: 700;
             border-bottom: 1px solid #cbd5e1;
         }
         td {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #f1f5f9;
             font-size: 12px;
         }
@@ -139,43 +128,40 @@
         .font-mono { font-family: monospace; }
         .totals {
             margin-left: auto;
-            width: 320px;
-            margin-bottom: 24px;
+            width: 300px;
+            margin-bottom: 16px;
         }
         .totals-row {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
+            padding: 3px 0;
             font-size: 12px;
             color: #475569;
         }
         .totals-row.grand-total {
             border-top: 2px solid #0f172a;
-            padding-top: 8px;
-            margin-top: 6px;
-            font-size: 16px;
+            padding-top: 6px;
+            margin-top: 4px;
+            font-size: 15px;
             font-weight: 800;
             color: #e11d48;
         }
-        .cod-notice {
-            background: #fef2f2;
-            border: 1px solid #fecdd3;
-            padding: 12px 16px;
-            border-radius: 8px;
-            color: #9f1239;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .note-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            color: #92400e;
+            margin-bottom: 16px;
         }
         .signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2e8f0;
         }
         .sig-block h4 {
             font-size: 12px;
@@ -188,7 +174,7 @@
             margin-top: 2px;
         }
         .sig-space {
-            height: 70px;
+            height: 48px;
         }
         .print-btn {
             position: fixed;
@@ -205,6 +191,7 @@
             box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.4);
             display: flex;
             align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
@@ -221,29 +208,29 @@
         <div class="header">
             <div class="shop-info">
                 <h1>HƯƠNG MÍT STORE</h1>
-                <p>Hệ thống phân phối Sữa & Đồ dùng Mẹ và Bé cao cấp</p>
-                <p>Hotline: 0900.000.001 - Website: haomilk.vn</p>
+                <p>Hotline: 0900.000.001 • Website: haomilk.vn</p>
             </div>
             <div class="order-title">
                 <h2>PHIẾU GIAO HÀNG</h2>
-                <p class="font-mono">#{{ $order->order_code }}</p>
-                <p style="font-size: 11px; margin-top: 4px;">Ngày: {{ $order->created_at->format('d/m/Y H:i') }}</p>
+                <p>Mã đơn: <strong class="font-mono">#{{ $order->order_code }}</strong></p>
+                <p style="font-size: 11px;">Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p>
             </div>
         </div>
 
-        <!-- Recipient & Sender Info -->
-        <div class="info-grid">
-            <div class="info-block">
-                <h3>Người gửi:</h3>
-                <strong>CỬA HÀNG HƯƠNG MÍT</strong>
-                <p>Hotline hỗ trợ: 0900.000.001</p>
-                <p>Hà Nội, Việt Nam</p>
+        <!-- Recipient & Delivery Info -->
+        <div class="delivery-box">
+            <div class="delivery-box-row">
+                <div>
+                    Người nhận: <strong>{{ $order->receiver_name }}</strong> ({{ $order->receiver_phone }})
+                </div>
+                <div>
+                    ĐVVC: <strong style="color: #e11d48;">{{ $order->shipping_carrier }}</strong>
+                </div>
             </div>
-            <div class="info-block">
-                <h3>Người nhận hàng:</h3>
-                <strong>{{ $order->receiver_name }}</strong>
-                <p>Số điện thoại: <strong>{{ $order->receiver_phone }}</strong></p>
-                <p>{{ $order->shipping_address }}</p>
+            <div class="delivery-box-row" style="margin-top: 4px;">
+                <div>
+                    Địa chỉ giao: <strong>{{ $order->shipping_address }}</strong>
+                </div>
             </div>
         </div>
 
@@ -251,12 +238,11 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 40px;" class="text-center">STT</th>
-                    <th>Tên sản phẩm & Phân loại</th>
-                    <th class="text-center" style="width: 100px;">Mã SKU</th>
-                    <th class="text-center" style="width: 70px;">SL</th>
-                    <th class="text-right" style="width: 110px;">Đơn giá</th>
-                    <th class="text-right" style="width: 120px;">Thành tiền</th>
+                    <th style="width: 36px;" class="text-center">STT</th>
+                    <th>Tên sản phẩm</th>
+                    <th class="text-center" style="width: 60px;">SL</th>
+                    <th class="text-right" style="width: 100px;">Đơn giá</th>
+                    <th class="text-right" style="width: 110px;">Thành tiền</th>
                 </tr>
             </thead>
             <tbody>
@@ -269,7 +255,6 @@
                                 <span style="color: #e11d48; font-size: 11px; display: block;">Phân loại: {{ $item->variant_name }}</span>
                             @endif
                         </td>
-                        <td class="text-center font-mono" style="font-size: 11px; color: #64748b;">{{ $item->sku }}</td>
                         <td class="text-center font-mono"><strong>{{ $item->quantity }}</strong></td>
                         <td class="text-right font-mono">{{ number_format($item->price, 0, ',', '.') }} đ</td>
                         <td class="text-right font-mono"><strong>{{ number_format($item->subtotal, 0, ',', '.') }} đ</strong></td>
@@ -284,10 +269,6 @@
                 <span>Tạm tính tiền hàng:</span>
                 <span class="font-mono">{{ number_format($order->subtotal, 0, ',', '.') }} đ</span>
             </div>
-            <div class="totals-row">
-                <span>Phí vận chuyển:</span>
-                <span>Thanh toán khi nhận</span>
-            </div>
             @if($order->discount_amount > 0)
             <div class="totals-row">
                 <span>Giảm giá:</span>
@@ -296,7 +277,7 @@
             @endif
             @if($order->deposit_required && (float) $order->deposit_amount > 0 && (float) $order->paid_amount > 0)
                 <div class="totals-row">
-                    <span>Tổng giá trị đơn hàng:</span>
+                    <span>Tổng đơn hàng:</span>
                     <span class="font-mono">{{ number_format($order->total_amount, 0, ',', '.') }} đ</span>
                 </div>
                 <div class="totals-row" style="color: #059669; font-weight: 600;">
@@ -304,7 +285,7 @@
                     <span class="font-mono">-{{ number_format($order->deposit_amount, 0, ',', '.') }} đ</span>
                 </div>
                 <div class="totals-row grand-total" style="color: {{ $order->payment_status === 'paid' ? '#059669' : '#b45309' }};">
-                    <span>{{ $order->payment_status === 'paid' ? 'TIỀN PHẢI THU SHIPPER (ĐÃ TẤT TOÁN):' : 'TIỀN PHẢI THU SHIPPER (60% COD):' }}</span>
+                    <span>{{ $order->payment_status === 'paid' ? 'TIỀN THU (ĐÃ TẤT TOÁN):' : 'TIỀN SHIPPER THU (60%):' }}</span>
                     <span class="font-mono">{{ number_format($order->remaining_amount, 0, ',', '.') }} đ</span>
                 </div>
             @elseif($order->payment_method === 'bank_transfer' && $order->payment_status === 'paid')
@@ -313,64 +294,19 @@
                     <span class="font-mono">{{ number_format($order->paid_amount, 0, ',', '.') }} đ</span>
                 </div>
                 <div class="totals-row grand-total" style="color: #059669;">
-                    <span>TIỀN PHẢI THU SHIPPER:</span>
-                    <span class="font-mono">0 đ</span>
+                    <span>TIỀN THU SHIPPER:</span>
+                    <span class="font-mono">0 đ (Đã thanh toán)</span>
                 </div>
             @else
                 <div class="totals-row grand-total">
-                    <span>TỔNG TIỀN PHẢI THU (COD):</span>
+                    <span>TIỀN THU (COD):</span>
                     <span class="font-mono">{{ number_format($order->total_amount, 0, ',', '.') }} đ</span>
                 </div>
             @endif
         </div>
 
-        <!-- Payment Notice Banner -->
-        @if($order->deposit_required && (float) $order->deposit_amount > 0 && (float) $order->paid_amount > 0)
-            @if($order->payment_status === 'paid' && (float) $order->remaining_amount <= 0)
-                <div class="cod-notice" style="background: #ecfdf5; border: 1.5px solid #6ee7b7; color: #065f46;">
-                    <div>
-                        <strong style="color: #047857; font-size: 13px;">HÌNH THỨC: COD ĐÃ ĐẶT CỌC 40% ({{ number_format($order->deposit_amount, 0, ',', '.') }} đ) & ĐÃ TẤT TOÁN PHẦN CÒN LẠI</strong>
-                        <p style="font-size: 11px; margin-top: 2px; color: #047857; font-weight: 600;">⚠️ ĐƠN HÀNG ĐÃ THANH TOÁN ĐỦ — KHÔNG THU THÊM TIỀN HÀNG.</p>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 900; color: #059669;">
-                        0 đ
-                    </div>
-                </div>
-            @else
-                <div class="cod-notice" style="background: #fffbeb; border: 2px solid #f59e0b; color: #78350f;">
-                    <div>
-                        <strong style="color: #b45309; font-size: 13px;">HÌNH THỨC: COD ĐÃ ĐẶT CỌC 40% (CHUYỂN KHOẢN {{ number_format($order->deposit_amount, 0, ',', '.') }} đ)</strong>
-                        <p style="font-size: 11px; margin-top: 2px; color: #92400e; font-weight: 700;">⚠️ KHÁCH ĐÃ CỌC 40% — SHIPPER CHỈ THU SỐ TIỀN CÒN LẠI: {{ number_format($order->remaining_amount, 0, ',', '.') }} đ. TUYỆT ĐỐI KHÔNG THU ĐỦ {{ number_format($order->total_amount, 0, ',', '.') }} đ.</p>
-                    </div>
-                    <div style="font-size: 16px; font-weight: 900; color: #b45309;">
-                        {{ number_format($order->remaining_amount, 0, ',', '.') }} đ
-                    </div>
-                </div>
-            @endif
-        @elseif($order->payment_method === 'bank_transfer' && $order->payment_status === 'paid')
-            <div class="cod-notice" style="background: #ecfdf5; border: 1.5px solid #6ee7b7; color: #065f46;">
-                <div>
-                    <strong style="color: #047857; font-size: 13px;">HÌNH THỨC: CHUYỂN KHOẢN VIETQR (ĐÃ THANH TOÁN 100%)</strong>
-                    <p style="font-size: 11px; margin-top: 2px; color: #047857; font-weight: 600;">⚠️ ĐÃ THANH TOÁN ĐỦ — SHIPPER TUYỆT ĐỐI KHÔNG THU TIỀN HÀNG CỦA KHÁCH.</p>
-                </div>
-                <div style="font-size: 16px; font-weight: 900; color: #059669;">
-                    0 đ
-                </div>
-            </div>
-        @else
-            <div class="cod-notice">
-                <div>
-                    <strong>HÌNH THỨC: THANH TOÁN KHI NHẬN HÀNG (COD)</strong>
-                    <p style="font-size: 11px; margin-top: 2px;">Cho phép khách hàng đồng kiểm kiện hàng trước khi thanh toán.</p>
-                </div>
-                <div style="font-size: 15px; font-weight: 800;">
-                    {{ number_format($order->total_amount, 0, ',', '.') }} đ
-                </div>
-            </div>
-        @endif
-
         @if($order->note)
-            <div style="background: #fffbeb; border: 1px solid #fef3c7; padding: 10px 14px; border-radius: 8px; font-size: 11px; color: #92400e; margin-bottom: 20px;">
+            <div class="note-box">
                 <strong>Ghi chú đơn hàng:</strong> {{ $order->note }}
             </div>
         @endif

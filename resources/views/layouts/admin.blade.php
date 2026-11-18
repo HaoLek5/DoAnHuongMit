@@ -261,26 +261,60 @@
                 </div>
             </header>
 
-            <!-- Alerts -->
-            <div class="px-4 sm:px-8 pt-4">
+            <!-- Toast Popup Notifications -->
+            @if(session('success') || session('error') || session('warning') || session('info'))
+            <div x-data="{ show: true }" 
+                 x-init="setTimeout(() => show = false, 4000)"
+                 x-show="show" 
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-4"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed top-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border p-4 flex items-start gap-3 pointer-events-auto @if(session('error')) border-rose-200 @elseif(session('warning')) border-amber-200 @elseif(session('info')) border-sky-200 @else border-emerald-200 @endif"
+                 role="alert">
+                
                 @if(session('success'))
-                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center gap-3 text-emerald-800 text-sm mb-4 shadow-sm">
-                    <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="font-medium">{{ session('success') }}</span>
-                </div>
+                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0 pt-0.5">
+                        <h4 class="text-xs font-bold text-slate-900">Thành công</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">{{ session('success') }}</p>
+                    </div>
+                @elseif(session('error'))
+                    <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0 pt-0.5">
+                        <h4 class="text-xs font-bold text-slate-900">Thông báo lỗi</h4>
+                        <p class="text-xs text-rose-600 mt-0.5 leading-relaxed">{{ session('error') }}</p>
+                    </div>
+                @elseif(session('warning'))
+                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0 pt-0.5">
+                        <h4 class="text-xs font-bold text-slate-900">Cảnh báo</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">{{ session('warning') }}</p>
+                    </div>
+                @elseif(session('info'))
+                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0 pt-0.5">
+                        <h4 class="text-xs font-bold text-slate-900">Thông tin</h4>
+                        <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">{{ session('info') }}</p>
+                    </div>
                 @endif
 
-                @if(session('error'))
-                <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center gap-3 text-rose-800 text-sm mb-4 shadow-sm">
-                    <svg class="w-5 h-5 text-rose-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    <span class="font-medium">{{ session('error') }}</span>
-                </div>
-                @endif
+                <button type="button" @click="show = false" class="text-slate-400 hover:text-slate-600 p-1 -mr-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
+            @endif
 
             <!-- Page Body -->
             <main class="flex-1 overflow-y-auto px-4 sm:px-8 pb-12">

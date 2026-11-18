@@ -48,6 +48,7 @@ class Order extends Model
         'status_label',
         'payment_method_label',
         'payment_status_label',
+        'shipping_carrier',
     ];
 
     public static function boot()
@@ -93,7 +94,7 @@ class Order extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->order_status) {
-            'pending' => 'Chờ xác nhận',
+            'pending' => 'Đã đặt hàng',
             'confirmed' => 'Đã xác nhận',
             'cancel_pending' => 'Chờ hủy',
             'processing' => 'Đang đóng gói',
@@ -116,6 +117,11 @@ class Order extends Model
             'cancelled' => 'bg-slate-100 text-slate-600 border-slate-200',
             default => 'bg-slate-50 text-slate-700 border-slate-200',
         };
+    }
+
+    public function getShippingCarrierAttribute(): string
+    {
+        return $this->payment_method === 'cod' ? 'GHTK' : 'VTP';
     }
 
     public function getPaymentMethodLabelAttribute(): string

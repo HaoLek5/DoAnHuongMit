@@ -38,22 +38,14 @@
                     </button>
                 </form>
             @elseif(in_array($order->order_status, ['confirmed', 'processing', 'shipping'], true))
-                @php
-                    $deliverConfirmMsg = ($order->payment_method === 'cod' && (float) $order->remaining_amount > 0)
-                        ? 'Xác nhận đơn hàng đã giao thành công? Hệ thống sẽ ghi nhận đã thu phần COD còn lại (' . number_format($order->remaining_amount, 0, ',', '.') . ' đ) và giữ nguyên lịch sử tiền cọc.'
-                        : 'Xác nhận đơn hàng đã giao thành công?';
-                @endphp
-                <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="inline"
-                      onsubmit="return confirm('{{ $deliverConfirmMsg }}')">
-                    @csrf
-                    @method('PUT')
-                    <input type="hidden" name="order_status" value="delivered">
-                    <button type="submit"
-                            class="px-4 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                        <span>Đánh dấu Giao thành công</span>
-                    </button>
-                </form>
+                <div class="hidden" aria-hidden="true">
+                    <form action="{{ route('admin.orders.update-status', $order) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="order_status" value="delivered">
+                        <button type="submit">Đánh dấu Giao thành công</button>
+                    </form>
+                </div>
             @endif
 
             <a href="{{ route('admin.orders.print', $order) }}" target="_blank"
@@ -128,20 +120,6 @@
                class="px-3.5 py-1.5 rounded-xl bg-amber-600 text-white font-bold whitespace-nowrap self-start sm:self-auto">
                 Xem đối soát
             </a>
-        </div>
-    @endif
-
-    @if(session('success'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2.5">
-            <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800 flex items-center gap-2.5">
-            <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-            <span>{{ session('error') }}</span>
         </div>
     @endif
 
@@ -288,6 +266,12 @@
                     <div class="font-medium text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-2xl border border-slate-100">
                         {{ $order->shipping_address }}
                     </div>
+                </div>
+
+                <!-- Shipping Carrier info -->
+                <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span class="text-slate-400">Đơn vị vận chuyển:</span>
+                    <span class="font-bold text-slate-800">{{ $order->shipping_carrier }}</span>
                 </div>
 
                 <!-- Payment info -->

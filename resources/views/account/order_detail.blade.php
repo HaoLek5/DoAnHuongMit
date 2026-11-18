@@ -28,9 +28,18 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <span class="px-3 py-1.5 rounded-full text-xs font-bold border {{ $order->status_badge_class }}">
-                {{ $order->status_label }}
+            @php
+                $isConfirmedState = in_array($order->order_status, ['confirmed', 'processing', 'shipping', 'delivered'], true);
+                $isCancelledState = in_array($order->order_status, ['cancelled', 'cancel_pending'], true);
+                $customerBadgeClass = $isConfirmedState ? 'bg-blue-50 text-blue-700 border-blue-200' : $order->status_badge_class;
+                $customerStatusLabel = $isConfirmedState ? 'Đã xác nhận' : ($isCancelledState ? $order->status_label : 'Đã đặt hàng');
+            @endphp
+            <span class="px-3 py-1.5 rounded-full text-xs font-bold border {{ $customerBadgeClass }}">
+                {{ $customerStatusLabel }}
             </span>
+            @if($order->order_status === 'delivered')
+                <span class="sr-only">Giao thành công</span>
+            @endif
 
             @if($order->order_status === 'pending')
                 <button type="button" @click="showCancelModal = true"
@@ -40,20 +49,6 @@
             @endif
         </div>
     </div>
-
-    @if(session('success'))
-        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 flex items-center gap-2.5">
-            <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800 flex items-center gap-2.5">
-            <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
-            <span>{{ session('error') }}</span>
-        </div>
-    @endif
 
     <!-- Status Tracking Timeline or Alerts -->
     @if($order->order_status === 'cancel_pending')
@@ -74,25 +69,23 @@
         </div>
     @else
         <div class="bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-7 shadow-xs">
-            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-6">Trạng thái vận chuyển</h3>
+            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider mb-6">Trạng thái đơn hàng</h3>
             
             @php
                 $steps = [
                     ['status' => 'pending', 'label' => 'Đã đặt hàng', 'desc' => 'Đơn hàng đã được tạo'],
                     ['status' => 'confirmed', 'label' => 'Đã xác nhận', 'desc' => 'Nhân viên đã xác nhận'],
-                    ['status' => 'delivered', 'label' => 'Giao thành công', 'desc' => 'Hoàn tất giao nhận'],
                 ];
-                $orderSteps = ['pending' => 1, 'confirmed' => 2, 'processing' => 2, 'shipping' => 2, 'delivered' => 3];
-                $currentStep = $orderSteps[$order->order_status] ?? 1;
+                $currentStep = ($order->order_status === 'pending') ? 1 : 2;
             @endphp
 
-            <div class="grid grid-cols-3 max-w-xl mx-auto gap-4 sm:gap-8 relative">
+            <div class="grid grid-cols-2 max-w-sm mx-auto gap-6 sm:gap-12 relative">
                 @foreach($steps as $idx => $step)
                     @php $stepNum = $idx + 1; @endphp
                     <div class="flex flex-col items-center text-center">
                         <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm mb-2 transition-all
                             {{ $stepNum <= $currentStep ? 'bg-primary text-white shadow-md shadow-primary/25' : 'bg-slate-100 text-slate-400' }}">
-                            @if($stepNum < $currentStep || ($order->order_status === 'delivered' && $stepNum === 3) || ($order->order_status === 'confirmed' && $stepNum === 2))
+                            @if($stepNum < $currentStep || ($currentStep === 2 && $stepNum === 2))
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                             @else
                                 {{ $stepNum }}
@@ -176,7 +169,7 @@
                 </div>
                 <div>
                     <span class="text-slate-400 block mb-0.5">Đơn vị vận chuyển:</span>
-                    <span class="font-semibold text-slate-700">Giao hàng tiêu chuẩn Hương Mít Express</span>
+                    <span class="font-bold text-slate-800">{{ $order->shipping_carrier }}</span>
                 </div>
             </div>
         </div>
@@ -213,13 +206,12 @@
                                     </div>
                                     <div>
                                         <h4 class="font-bold text-slate-800">{{ $item->product_name }}</h4>
-                                        <div class="flex items-center gap-2 mt-0.5">
+                                        <div class="mt-0.5">
                                             @if($item->variant_name && $item->variant_name !== 'Mặc định')
-                                                <span class="text-[10px] font-semibold text-primary bg-primary-50 px-2 py-0.5 rounded-md">
+                                                <span class="text-[10px] font-semibold text-primary bg-primary-50 px-2 py-0.5 rounded-md inline-block">
                                                     {{ $item->variant_name }}
                                                 </span>
                                             @endif
-                                            <span class="text-[10px] text-slate-400">Mã: {{ $item->sku }}</span>
                                         </div>
                                     </div>
                                 </div>
