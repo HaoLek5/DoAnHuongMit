@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 
@@ -62,11 +63,24 @@ class AuthController extends Controller
             'role' => 'customer',
         ]);
 
-        // Tạo mã OTP 6 số và gửi qua email
-        $code = EmailVerification::generate($user->email, 'register');
-        Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+        // Tạo mã OTP 6 số hash bảo mật và gửi qua email
+        $code = EmailVerification::generate($user->email, 'register', 15, $request->ip());
+        EmailVerification::hitRateLimiter($user->email, 'register', $request->ip());
+
+        $mailSent = true;
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+        } catch (\Throwable $e) {
+            $mailSent = false;
+            Log::error('Lỗi gửi email xác thực đăng ký cho '.$user->email.': '.$e->getMessage());
+        }
 
         Auth::login($user, remember: false);
+
+        if (! $mailSent) {
+            return redirect()->route('verification.notice')
+                ->with('warning', 'Đăng ký tài khoản thành công nhưng hệ thống chưa thể gửi email OTP do sự cố kết nối máy chủ thư. Vui lòng bấm "Gửi lại mã" sau ít phút.');
+        }
 
         return redirect()->route('verification.notice')
             ->with('success', 'Đăng ký tài khoản thành công! Vui lòng nhập mã OTP 6 số vừa được gửi tới email của bạn để kích hoạt tài khoản.');
@@ -106,9 +120,11 @@ class AuthController extends Controller
             return redirect()->route('home');
         }
 
-        if (! EmailVerification::verify($user->email, $request->code, 'register')) {
+        $result = EmailVerification::verifyDetailed($user->email, $request->code, 'register');
+
+        if (! $result['success']) {
             return back()->withErrors([
-                'code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng thử lại hoặc yêu cầu gửi lại mã mới.',
+                'code' => $result['message'],
             ]);
         }
 
@@ -127,6 +143,12 @@ class AuthController extends Controller
             return redirect()->route('home');
         }
 
+        if (EmailVerification::isRateLimited($user->email, 'register', $request->ip())) {
+            return back()->withErrors([
+                'resend' => 'Bạn đã yêu cầu gửi mã quá nhiều lần trong 1 giờ. Vui lòng thử lại sau.',
+            ]);
+        }
+
         if (! EmailVerification::canResend($user->email, 'register')) {
             $seconds = EmailVerification::secondsUntilResend($user->email, 'register');
 
@@ -135,8 +157,18 @@ class AuthController extends Controller
             ]);
         }
 
-        $code = EmailVerification::generate($user->email, 'register');
-        Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+        $code = EmailVerification::generate($user->email, 'register', 15, $request->ip());
+        EmailVerification::hitRateLimiter($user->email, 'register', $request->ip());
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Lỗi gửi lại email xác thực cho '.$user->email.': '.$e->getMessage());
+
+            return back()->withErrors([
+                'resend' => 'Không thể gửi email lúc này do sự cố kết nối máy chủ gửi thư. Vui lòng thử lại sau ít phút.',
+            ]);
+        }
 
         return back()->with('success', 'Mã xác thực mới đã được gửi tới email của bạn. Vui lòng kiểm tra hộp thư đến (hoặc thư rác).');
     }
@@ -202,9 +234,14 @@ class AuthController extends Controller
 
             // Nếu tài khoản khách hàng chưa xác thực email, yêu cầu xác thực OTP
             if (! $authUser->hasVerifiedEmail()) {
-                if (EmailVerification::canResend($authUser->email, 'register')) {
-                    $code = EmailVerification::generate($authUser->email, 'register');
-                    Mail::to($authUser->email)->send(new EmailVerificationMail($code, 'register', $authUser->name));
+                if (EmailVerification::canResend($authUser->email, 'register') && ! EmailVerification::isRateLimited($authUser->email, 'register', $request->ip())) {
+                    $code = EmailVerification::generate($authUser->email, 'register', 15, $request->ip());
+                    EmailVerification::hitRateLimiter($authUser->email, 'register', $request->ip());
+                    try {
+                        Mail::to($authUser->email)->send(new EmailVerificationMail($code, 'register', $authUser->name));
+                    } catch (\Throwable $e) {
+                        Log::error('Lỗi gửi email xác thực đăng nhập cho '.$authUser->email.': '.$e->getMessage());
+                    }
                 }
 
                 return redirect()->route('verification.notice')
@@ -256,6 +293,12 @@ class AuthController extends Controller
                 ->withErrors(['email' => 'Địa chỉ email này chưa được đăng ký trong hệ thống Hương Mít.']);
         }
 
+        if (EmailVerification::isRateLimited($user->email, 'reset_password', $request->ip())) {
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Bạn đã yêu cầu gửi mã quá nhiều lần trong 1 giờ. Vui lòng thử lại sau.']);
+        }
+
         if (! EmailVerification::canResend($user->email, 'reset_password')) {
             $seconds = EmailVerification::secondsUntilResend($user->email, 'reset_password');
 
@@ -264,8 +307,18 @@ class AuthController extends Controller
                 ->withErrors(['email' => "Mã xác thực vừa được gửi. Vui lòng đợi {$seconds} giây trước khi yêu cầu mã mới."]);
         }
 
-        $code = EmailVerification::generate($user->email, 'reset_password');
-        Mail::to($user->email)->send(new EmailVerificationMail($code, 'reset_password', $user->name));
+        $code = EmailVerification::generate($user->email, 'reset_password', 15, $request->ip());
+        EmailVerification::hitRateLimiter($user->email, 'reset_password', $request->ip());
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($code, 'reset_password', $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Lỗi gửi email đặt lại mật khẩu cho '.$user->email.': '.$e->getMessage());
+
+            return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => 'Hệ thống gửi thư đang gặp sự cố kết nối. Vui lòng thử lại sau ít phút.']);
+        }
 
         session(['reset_password_email' => $user->email]);
 
@@ -293,6 +346,18 @@ class AuthController extends Controller
             return back()->withErrors(['email' => $msg]);
         }
 
+        if (EmailVerification::isRateLimited($user->email, 'reset_password', $request->ip())) {
+            $msg = 'Bạn đã yêu cầu gửi mã quá nhiều lần trong 1 giờ. Vui lòng thử lại sau.';
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 429);
+            }
+
+            return back()->withErrors(['email' => $msg]);
+        }
+
         if (! EmailVerification::canResend($user->email, 'reset_password')) {
             $seconds = EmailVerification::secondsUntilResend($user->email, 'reset_password');
             $msg = "Vui lòng đợi {$seconds} giây trước khi yêu cầu gửi lại mã.";
@@ -308,8 +373,24 @@ class AuthController extends Controller
             return back()->withErrors(['resend' => $msg]);
         }
 
-        $code = EmailVerification::generate($user->email, 'reset_password');
-        Mail::to($user->email)->send(new EmailVerificationMail($code, 'reset_password', $user->name));
+        $code = EmailVerification::generate($user->email, 'reset_password', 15, $request->ip());
+        EmailVerification::hitRateLimiter($user->email, 'reset_password', $request->ip());
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($code, 'reset_password', $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Lỗi gửi lại email đặt lại mật khẩu cho '.$user->email.': '.$e->getMessage());
+            $msg = 'Hệ thống gửi thư đang gặp sự cố kết nối. Vui lòng thử lại sau ít phút.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 500);
+            }
+
+            return back()->withErrors(['resend' => $msg]);
+        }
 
         $msg = "Mã xác thực mới đã được gửi tới email {$user->email}.";
 
@@ -353,10 +434,12 @@ class AuthController extends Controller
             'password.min' => 'Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm cả chữ và số.',
         ]);
 
-        if (! EmailVerification::verify($validated['email'], $validated['code'], 'reset_password')) {
+        $result = EmailVerification::verifyDetailed($validated['email'], $validated['code'], 'reset_password');
+
+        if (! $result['success']) {
             return back()
                 ->withInput($request->except('password', 'password_confirmation', 'code'))
-                ->withErrors(['code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng thử lại hoặc yêu cầu gửi lại mã mới.']);
+                ->withErrors(['code' => $result['message']]);
         }
 
         $user = User::where('email', $validated['email'])->first();

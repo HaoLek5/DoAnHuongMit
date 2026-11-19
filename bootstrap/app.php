@@ -24,7 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'verified' => EnsureEmailIsVerified::class,
-            'verified' => EnsureEmailIsVerified::class,
         ]);
 
         // Danh sách proxy tin cậy (TRUSTED_PROXIES) được nạp qua config/trustedproxy.php sau khi .env đã sẵn sàng.

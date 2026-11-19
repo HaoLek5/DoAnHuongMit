@@ -1,58 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Hương Mít — Website Mẹ & Bé (E-Commerce Platform)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Hệ thống website thương mại điện tử chuyên cung cấp sản phẩm mẹ và bé **Hương Mít** (`huongmit.shop`), được phát triển trên nền tảng **Laravel 13**, **PHP 8.3**, tích hợp thanh toán chuyển khoản **VietQR**, tự động hóa webhook **SePay** và trợ lý tư vấn bán hàng thông minh **Google Gemini AI**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 1. Công nghệ Sử dụng (Tech Stack)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Backend:** Laravel 13.x, PHP 8.3
+- **Cơ sở dữ liệu:** MySQL 8.x (InnoDB Engine)
+- **Frontend:** Blade Templates, Tailwind CSS v4, Alpine.js, Vite
+- **Thanh toán:** VietQR NAPAS 247, SePay Webhook Auto Reconciliation
+- **Trí tuệ nhân tạo:** Google Gemini AI API (`gemini-3.5-flash-lite`)
+- **Kiểm thử & Định dạng:** PHPUnit 12.x, Laravel Pint (PSR-12)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 2. Hướng dẫn Cài đặt Môi trường Phát triển (Local Setup)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Yêu cầu hệ thống:
+- PHP >= 8.3 với các extension: `pdo_mysql`, `mbstring`, `openssl`, `curl`, `fileinfo`.
+- Composer 2.x
+- Node.js >= 18.x & NPM
+- MySQL 8.0+ (khuyến nghị chạy trên Laragon hoặc Docker)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Các bước cài đặt:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+1. **Clone repository và cài đặt thư viện PHP:**
+   ```bash
+   git clone <repository_url> haomilk
+   cd haomilk
+   composer install
+   ```
 
-## Agentic Development
+2. **Cấu hình môi trường:**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+   *Mở file `.env` và điền thông tin kết nối MySQL database của bạn (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).*
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+3. **Chạy Migration & Seeder dữ liệu mẫu:**
+   ```bash
+   php artisan migrate
+   php artisan db:seed --class=UserSeeder
+   ```
+   *(Mặc định tạo tài khoản Quản trị viên: `haopak2k5@gmail.com`)*
+
+4. **Cài đặt thư viện Frontend & Build tài nguyên:**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+5. **Khởi động server phát triển:**
+   ```bash
+   composer run dev
+   # Hoặc: php artisan serve
+   ```
+   Truy cập website tại: `http://localhost:8000` (hoặc `http://haomilk.test` trên Laragon).
+
+---
+
+## 3. Các Lệnh Vận hành Cơ bản (Operational Commands)
 
 ```bash
-composer require laravel/boost --dev
+# Chạy toàn bộ bộ kiểm thử tự động (115 tests)
+php artisan test --compact
 
-php artisan boost:install
+# Định dạng mã nguồn theo chuẩn PSR-12 của dự án
+vendor/bin/pint --format agent
+
+# Xóa bộ nhớ đệm khi cập nhật cấu hình
+php artisan optimize:clear
+
+# Bật bộ nhớ đệm tối ưu hóa cho Production
+php artisan optimize
+
+# Kiểm tra danh sách route của hệ thống
+php artisan route:list
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## 4. Tài liệu Kỹ thuật Quan trọng
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- [Kiến trúc Hệ thống & Quyết định Kỹ thuật (docs/ARCHITECTURE.md)](docs/ARCHITECTURE.md): Tổng quan kiến trúc MVC, bảo mật OTP, SePay idempotency, khóa đồng thời ConcurrencyLock, kiểm soát tồn kho và nghiệp vụ đơn cọc 40%.
+- [Hướng dẫn Triển khai Lên AZDIGI Hosting (docs/DEPLOYMENT.md)](docs/DEPLOYMENT.md): Quy trình đưa ứng dụng lên AZDIGI cPanel shared hosting, cấu hình SMTP, Webhook SePay và cron job.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 5. Giấy phép (License)
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Dự án thuộc bản quyền sở hữu của Cửa hàng Mẹ & Bé Hương Mít. Mọi quyền được bảo lưu.

@@ -28,9 +28,9 @@ class EmailVerificationMail extends Mailable
     public function envelope(): Envelope
     {
         $subject = match ($this->action) {
-            'change_password' => "[Hương Mít] Mã xác thực đổi mật khẩu: {$this->code}",
-            'reset_password', 'forgot_password' => "[Hương Mít] Mã xác thực đặt lại mật khẩu: {$this->code}",
-            default => "[Hương Mít] Mã xác thực đăng ký tài khoản: {$this->code}",
+            'change_password' => '[Hương Mít] Mã xác thực đổi mật khẩu tài khoản',
+            'reset_password', 'forgot_password' => '[Hương Mít] Mã xác thực đặt lại mật khẩu',
+            default => '[Hương Mít] Mã xác thực đăng ký tài khoản',
         };
 
         return new Envelope(

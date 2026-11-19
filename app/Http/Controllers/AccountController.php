@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rules\Password;
 
@@ -74,6 +75,19 @@ class AccountController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        if (EmailVerification::isRateLimited($user->email, 'change_password', $request->ip())) {
+            $msg = 'Bạn đã yêu cầu gửi mã quá nhiều lần trong 1 giờ. Vui lòng thử lại sau.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 429);
+            }
+
+            return back()->withErrors(['verification_code' => $msg]);
+        }
+
         if (! EmailVerification::canResend($user->email, 'change_password')) {
             $seconds = EmailVerification::secondsUntilResend($user->email, 'change_password');
             $msg = "Vui lòng đợi {$seconds} giây trước khi yêu cầu mã mới.";
@@ -89,8 +103,24 @@ class AccountController extends Controller
             return back()->withErrors(['verification_code' => $msg]);
         }
 
-        $code = EmailVerification::generate($user->email, 'change_password');
-        Mail::to($user->email)->send(new EmailVerificationMail($code, 'change_password', $user->name));
+        $code = EmailVerification::generate($user->email, 'change_password', 15, $request->ip());
+        EmailVerification::hitRateLimiter($user->email, 'change_password', $request->ip());
+
+        try {
+            Mail::to($user->email)->send(new EmailVerificationMail($code, 'change_password', $user->name));
+        } catch (\Throwable $e) {
+            Log::error('Lỗi gửi email mã đổi mật khẩu cho '.$user->email.': '.$e->getMessage());
+            $msg = 'Hệ thống gửi thư đang gặp sự cố kết nối. Vui lòng thử lại sau ít phút.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 500);
+            }
+
+            return back()->withErrors(['verification_code' => $msg]);
+        }
 
         $msg = "Mã xác thực 6 số đã được gửi tới email {$user->email}. Mã có hiệu lực trong vòng 15 phút.";
 
@@ -124,9 +154,11 @@ class AccountController extends Controller
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
         ]);
 
-        if (! EmailVerification::verify($user->email, $validated['verification_code'], 'change_password')) {
+        $result = EmailVerification::verifyDetailed($user->email, $validated['verification_code'], 'change_password');
+
+        if (! $result['success']) {
             return back()
-                ->withErrors(['verification_code' => 'Mã xác thực không chính xác hoặc đã hết hạn. Vui lòng bấm "Gửi mã xác thực" để nhận mã mới.'])
+                ->withErrors(['verification_code' => $result['message']])
                 ->withInput($request->except('password', 'password_confirmation', 'verification_code'));
         }
 

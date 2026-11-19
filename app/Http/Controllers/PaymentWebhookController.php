@@ -110,7 +110,9 @@ class PaymentWebhookController extends Controller
             ?? $request->input('id');
 
         $accountNumber = $request->input('accountNumber')
-            ?? $request->input('account_number');
+            ?? $request->input('account_number')
+            ?? $request->input('subAccount')
+            ?? $request->input('bank_sub_acc_id');
 
         $transferType = $request->input('transferType');
         $gateway = trim((string) ($request->input('gateway') ?? 'SePay'));
@@ -166,10 +168,11 @@ class PaymentWebhookController extends Controller
             }
         }
 
-        // Kiểm tra chữ ký HMAC-SHA256 trên raw body nếu có cấu hình secret HMAC
+        // Kiểm tra chữ ký HMAC-SHA256 chuẩn SePay nếu có cấu hình secret HMAC
         if ($configuredHmacSecret !== '') {
             $providedSignature = (string) (
-                $request->header('X-Sepay-Signature')
+                $request->header('X-SePay-Signature')
+                ?? $request->header('X-Sepay-Signature')
                 ?? $request->header('X-Signature')
                 ?? $request->header('X-Hmac-Signature')
                 ?? ''
@@ -181,12 +184,39 @@ class PaymentWebhookController extends Controller
             }
 
             $rawBody = $request->getContent();
-            $expectedHex = hash_hmac('sha256', $rawBody, $configuredHmacSecret);
-            $expectedBase64 = base64_encode(hash_hmac('sha256', $rawBody, $configuredHmacSecret, true));
+            $timestamp = $request->header('X-SePay-Timestamp') ?? $request->header('X-Sepay-Timestamp');
+
+            // 1. Chống Replay Attack: Kiểm tra timestamp từ header SePay (giới hạn lệch tối đa 300s = 5 phút)
+            if ($timestamp !== null && $timestamp !== '') {
+                $requestTime = (int) $timestamp;
+                $currentTime = time();
+                if (abs($currentTime - $requestTime) > 300) {
+                    Log::warning('Webhook: Chữ ký HMAC bị từ chối do timestamp hết hạn (Replay Attack).', [
+                        'ip' => $request->ip(),
+                        'timestamp' => $timestamp,
+                        'current_time' => $currentTime,
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Yêu cầu Webhook đã hết hạn hiệu lực (Timestamp quá hạn 5 phút).',
+                    ], 401);
+                }
+
+                $stringToSign = "{$timestamp}.{$rawBody}";
+            } else {
+                $stringToSign = $rawBody;
+            }
+
+            // 2. Tính toán chữ ký HMAC-SHA256 theo chuẩn SePay: hash_hmac('sha256', timestamp . '.' . rawBody, secret)
+            $expectedHex = hash_hmac('sha256', $stringToSign, $configuredHmacSecret);
+            $expectedBase64 = base64_encode(hash_hmac('sha256', $stringToSign, $configuredHmacSecret, true));
+            $fallbackHex = hash_hmac('sha256', $rawBody, $configuredHmacSecret);
 
             $isValidHmac = $providedSignature !== '' && (
                 hash_equals($expectedHex, strtolower($providedSignature))
                 || hash_equals($expectedBase64, $providedSignature)
+                || hash_equals($fallbackHex, strtolower($providedSignature))
             );
 
             if (! $isValidHmac) {
@@ -210,8 +240,12 @@ class PaymentWebhookController extends Controller
     protected function extractTokenFromHeaders(Request $request): ?string
     {
         $authHeader = trim((string) $request->header('Authorization', ''));
-        if ($authHeader !== '' && preg_match('/^(?:Apikey|Bearer)\s+(.+)$/i', $authHeader, $matches)) {
-            return trim($matches[1]);
+        if ($authHeader !== '') {
+            if (preg_match('/^(?:Apikey|Bearer)\s+(.+)$/i', $authHeader, $matches)) {
+                return trim($matches[1]);
+            }
+
+            return $authHeader;
         }
 
         foreach (['X-Api-Key', 'secure-token'] as $headerName) {
@@ -238,7 +272,7 @@ class PaymentWebhookController extends Controller
             'transferType' => $request->input('transferType'),
             'transferAmount' => $request->input('transferAmount') ?? $request->input('amount'),
             'referenceCode' => $request->input('referenceCode') ?? $request->input('reference'),
-            'accountNumber_last4' => substr(preg_replace('/\D/', '', (string) ($request->input('accountNumber') ?? '')), -4) ?: null,
+            'accountNumber_last4' => substr(preg_replace('/\D/', '', (string) ($request->input('accountNumber') ?? $request->input('subAccount') ?? '')), -4) ?: null,
             'has_content' => ! empty($request->input('content') ?? $request->input('description')),
         ];
     }
