@@ -68,15 +68,13 @@ Route::post('/dang-xuat', [AuthController::class, 'logout'])
     ->middleware('auth');
 
 // ─── Email Verification Routes ───────────────────────────────────────────────
-Route::middleware('auth')->group(function () {
-    Route::get('/xac-thuc-email', [AuthController::class, 'showVerifyEmail'])->name('verification.notice');
-    Route::post('/xac-thuc-email', [AuthController::class, 'verifyEmail'])
-        ->middleware('throttle:6,1')
-        ->name('verification.verify');
-    Route::post('/xac-thuc-email/gui-lai', [AuthController::class, 'resendVerificationEmail'])
-        ->middleware('throttle:6,1')
-        ->name('verification.resend');
-});
+Route::get('/xac-thuc-email', [AuthController::class, 'showVerifyEmail'])->name('verification.notice');
+Route::post('/xac-thuc-email', [AuthController::class, 'verifyEmail'])
+    ->middleware('throttle:6,1')
+    ->name('verification.verify');
+Route::post('/xac-thuc-email/gui-lai', [AuthController::class, 'resendVerificationEmail'])
+    ->middleware('throttle:6,1')
+    ->name('verification.resend');
 
 // ─── Checkout & Order Placement ─────────────────────────────────────────────
 use App\Http\Controllers\CheckoutController;

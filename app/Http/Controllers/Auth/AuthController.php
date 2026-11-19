@@ -40,7 +40,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:191', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:191'],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ], [
@@ -48,42 +48,56 @@ class AuthController extends Controller
             'name.max' => 'Họ tên không được vượt quá 100 ký tự.',
             'email.required' => 'Vui lòng nhập email.',
             'email.email' => 'Địa chỉ email không hợp lệ.',
-            'email.unique' => 'Email này đã được đăng ký.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
             'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'password' => Hash::make($validated['password']),
-            'role' => 'customer',
+        $normalizedEmail = strtolower(trim($validated['email']));
+
+        // Kiểm tra xem email đã có tài khoản kích hoạt trước đó hay chưa
+        $existingUser = User::where('email', $normalizedEmail)->first();
+        if ($existingUser) {
+            if ($existingUser->hasVerifiedEmail()) {
+                return back()
+                    ->withInput($request->only('name', 'email', 'phone'))
+                    ->withErrors(['email' => 'Địa chỉ email này đã được đăng ký và kích hoạt. Vui lòng đăng nhập.']);
+            }
+
+            // Nếu tài khoản cũ chưa kích hoạt từ trước, dọn dẹp để cho phép đăng ký mới
+            $existingUser->delete();
+        }
+
+        // Lưu thông tin đăng ký tạm thời vào session (TUYỆT ĐỐI CHƯA LƯU VÀO DATABASE KHI CHƯA NHẬP OTP)
+        session([
+            'pending_registration' => [
+                'name' => $validated['name'],
+                'email' => $normalizedEmail,
+                'phone' => $validated['phone'] ?? null,
+                'password' => Hash::make($validated['password']),
+            ],
         ]);
 
         // Tạo mã OTP 6 số hash bảo mật và gửi qua email
-        $code = EmailVerification::generate($user->email, 'register', 15, $request->ip());
-        EmailVerification::hitRateLimiter($user->email, 'register', $request->ip());
+        $code = EmailVerification::generate($normalizedEmail, 'register', 15, $request->ip());
+        EmailVerification::hitRateLimiter($normalizedEmail, 'register', $request->ip());
 
         $mailSent = true;
         try {
-            Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+            Mail::to($normalizedEmail)->send(new EmailVerificationMail($code, 'register', $validated['name']));
         } catch (\Throwable $e) {
             $mailSent = false;
-            Log::error('Lỗi gửi email xác thực đăng ký cho '.$user->email.': '.$e->getMessage());
+            Log::error('Lỗi gửi email xác thực đăng ký cho '.$normalizedEmail.': '.$e->getMessage());
         }
-
-        Auth::login($user, remember: false);
 
         if (! $mailSent) {
             return redirect()->route('verification.notice')
-                ->with('warning', 'Đăng ký tài khoản thành công nhưng hệ thống chưa thể gửi email OTP do sự cố kết nối máy chủ thư. Vui lòng bấm "Gửi lại mã" sau ít phút.');
+                ->with('warning', 'Hệ thống chưa thể gửi email OTP do sự cố kết nối máy chủ thư. Vui lòng bấm "Gửi lại mã" sau ít phút.');
         }
 
         return redirect()->route('verification.notice')
-            ->with('success', 'Đăng ký tài khoản thành công! Vui lòng nhập mã OTP 6 số vừa được gửi tới email của bạn để kích hoạt tài khoản.');
+            ->with('success', 'Mã xác thực OTP 6 số đã được gửi tới email của bạn. Vui lòng nhập mã để hoàn tất đăng ký.');
     }
 
     // ─────────────────────────────────────────
@@ -92,16 +106,29 @@ class AuthController extends Controller
 
     public function showVerifyEmail()
     {
-        /** @var User $user */
-        $user = Auth::user();
+        if (Auth::check()) {
+            /** @var User $user */
+            $user = Auth::user();
+            if ($user->hasVerifiedEmail()) {
+                return redirect()->route('home');
+            }
 
-        if ($user->hasVerifiedEmail()) {
-            return redirect()->route('home');
+            $email = $user->email;
+            $userName = $user->name;
+        } else {
+            $pending = session('pending_registration');
+            if (! $pending || empty($pending['email'])) {
+                return redirect()->route('auth.register')
+                    ->withErrors(['email' => 'Vui lòng điền thông tin đăng ký trước khi xác thực mã OTP.']);
+            }
+
+            $email = $pending['email'];
+            $userName = $pending['name'];
         }
 
-        $secondsUntilResend = EmailVerification::secondsUntilResend($user->email, 'register');
+        $secondsUntilResend = EmailVerification::secondsUntilResend($email, 'register');
 
-        return view('auth.verify_email', compact('user', 'secondsUntilResend'));
+        return view('auth.verify_email', compact('email', 'userName', 'secondsUntilResend'));
     }
 
     public function verifyEmail(Request $request)
@@ -113,57 +140,110 @@ class AuthController extends Controller
             'code.size' => 'Mã xác thực gồm đúng 6 chữ số.',
         ]);
 
-        /** @var User $user */
-        $user = Auth::user();
+        // 1. Trường hợp người dùng đã đăng nhập (tài khoản cũ chưa kích hoạt)
+        if (Auth::check()) {
+            /** @var User $user */
+            $user = Auth::user();
+            if ($user->hasVerifiedEmail()) {
+                return redirect()->route('home');
+            }
 
-        if ($user->hasVerifiedEmail()) {
-            return redirect()->route('home');
+            $result = EmailVerification::verifyDetailed($user->email, $request->code, 'register');
+            if (! $result['success']) {
+                return back()->withErrors(['code' => $result['message']]);
+            }
+
+            $user->markEmailAsVerified();
+
+            return redirect()->route('home')
+                ->with('success', 'Xác thực tài khoản thành công! Chào mừng bạn đến với Hương Mít.');
         }
 
-        $result = EmailVerification::verifyDetailed($user->email, $request->code, 'register');
+        // 2. Trường hợp đăng ký mới: Chỉ lưu vào database khi mã OTP được nhập ĐÚNG
+        $pending = session('pending_registration');
+        if (! $pending || empty($pending['email'])) {
+            return redirect()->route('auth.register')
+                ->withErrors(['email' => 'Phiên đăng ký đã hết hạn hoặc không tồn tại. Vui lòng đăng ký lại.']);
+        }
+
+        $email = $pending['email'];
+        $result = EmailVerification::verifyDetailed($email, $request->code, 'register');
 
         if (! $result['success']) {
-            return back()->withErrors([
-                'code' => $result['message'],
-            ]);
+            return back()->withErrors(['code' => $result['message']]);
         }
+
+        // Tránh race-condition nếu email đã kịp đăng ký ở luồng khác
+        if (User::where('email', $email)->exists()) {
+            session()->forget('pending_registration');
+
+            return redirect()->route('auth.login')
+                ->withErrors(['email' => 'Tài khoản này đã tồn tại trong hệ thống. Vui lòng đăng nhập.']);
+        }
+
+        // Tạo bản ghi User chính thức vào Database (ĐÃ XÁC THỰC EMAIL)
+        $user = User::create([
+            'name' => $pending['name'],
+            'email' => $email,
+            'phone' => $pending['phone'] ?? null,
+            'password' => $pending['password'],
+            'role' => 'customer',
+        ]);
 
         $user->markEmailAsVerified();
 
+        session()->forget('pending_registration');
+
+        // Tự động đăng nhập cho người dùng
+        Auth::login($user, remember: true);
+
         return redirect()->route('home')
-            ->with('success', 'Xác thực tài khoản thành công! Chào mừng bạn đến với Hương Mít.');
+            ->with('success', 'Đăng ký và kích hoạt tài khoản thành công! Chào mừng bạn đến với Hương Mít.');
     }
 
     public function resendVerificationEmail(Request $request)
     {
-        /** @var User $user */
-        $user = Auth::user();
+        if (Auth::check()) {
+            /** @var User $user */
+            $user = Auth::user();
+            if ($user->hasVerifiedEmail()) {
+                return redirect()->route('home');
+            }
 
-        if ($user->hasVerifiedEmail()) {
-            return redirect()->route('home');
+            $email = $user->email;
+            $userName = $user->name;
+        } else {
+            $pending = session('pending_registration');
+            if (! $pending || empty($pending['email'])) {
+                return redirect()->route('auth.register')
+                    ->withErrors(['email' => 'Vui lòng điền thông tin đăng ký trước khi yêu cầu gửi mã.']);
+            }
+
+            $email = $pending['email'];
+            $userName = $pending['name'];
         }
 
-        if (EmailVerification::isRateLimited($user->email, 'register', $request->ip())) {
+        if (EmailVerification::isRateLimited($email, 'register', $request->ip())) {
             return back()->withErrors([
                 'resend' => 'Bạn đã yêu cầu gửi mã quá nhiều lần trong 1 giờ. Vui lòng thử lại sau.',
             ]);
         }
 
-        if (! EmailVerification::canResend($user->email, 'register')) {
-            $seconds = EmailVerification::secondsUntilResend($user->email, 'register');
+        if (! EmailVerification::canResend($email, 'register')) {
+            $seconds = EmailVerification::secondsUntilResend($email, 'register');
 
             return back()->withErrors([
                 'resend' => "Vui lòng đợi {$seconds} giây trước khi yêu cầu gửi lại mã.",
             ]);
         }
 
-        $code = EmailVerification::generate($user->email, 'register', 15, $request->ip());
-        EmailVerification::hitRateLimiter($user->email, 'register', $request->ip());
+        $code = EmailVerification::generate($email, 'register', 15, $request->ip());
+        EmailVerification::hitRateLimiter($email, 'register', $request->ip());
 
         try {
-            Mail::to($user->email)->send(new EmailVerificationMail($code, 'register', $user->name));
+            Mail::to($email)->send(new EmailVerificationMail($code, 'register', $userName));
         } catch (\Throwable $e) {
-            Log::error('Lỗi gửi lại email xác thực cho '.$user->email.': '.$e->getMessage());
+            Log::error('Lỗi gửi lại email xác thực cho '.$email.': '.$e->getMessage());
 
             return back()->withErrors([
                 'resend' => 'Không thể gửi email lúc này do sự cố kết nối máy chủ gửi thư. Vui lòng thử lại sau ít phút.',

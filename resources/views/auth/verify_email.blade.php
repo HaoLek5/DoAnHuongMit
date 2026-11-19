@@ -15,7 +15,7 @@
         <h1 class="text-2xl font-bold text-gray-800 mb-1">Xác thực tài khoản</h1>
         <p class="text-xs sm:text-sm text-gray-500 max-w-sm mx-auto leading-relaxed">
             Mã OTP 6 số đã được gửi đến hộp thư:<br>
-            <span class="font-bold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-lg inline-block mt-1">{{ $user->email }}</span>
+            <span class="font-bold text-gray-800 bg-gray-100 px-2.5 py-0.5 rounded-lg inline-block mt-1">{{ $email ?? $user->email ?? '' }}</span>
         </p>
     </div>
 
@@ -128,14 +128,20 @@
         </form>
     </div>
 
-    {{-- Change email / Logout --}}
+    {{-- Change email / Back to register --}}
     <div class="mt-4 text-center">
-        <form method="POST" action="{{ route('auth.logout') }}" class="inline">
-            @csrf
-            <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 underline">
-                Nhập sai email? Đăng xuất để đăng ký lại
-            </button>
-        </form>
+        @auth
+            <form method="POST" action="{{ route('auth.logout') }}" class="inline">
+                @csrf
+                <button type="submit" class="text-xs text-gray-400 hover:text-gray-600 underline">
+                    Nhập sai email? Đăng xuất để đăng ký lại
+                </button>
+            </form>
+        @else
+            <a href="{{ route('auth.register') }}" class="text-xs text-gray-400 hover:text-gray-600 underline">
+                Nhập sai email? Quay lại để đăng ký lại
+            </a>
+        @endauth
     </div>
 
 @endsection

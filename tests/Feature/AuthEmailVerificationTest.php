@@ -26,7 +26,7 @@ class AuthEmailVerificationTest extends TestCase
         $this->assertTrue($admin->hasVerifiedEmail());
     }
 
-    public function test_registration_creates_unverified_user_and_sends_otp(): void
+    public function test_registration_does_not_save_user_until_otp_is_verified(): void
     {
         Mail::fake();
 
@@ -34,16 +34,15 @@ class AuthEmailVerificationTest extends TestCase
             'name' => 'Nguyễn Văn A',
             'email' => 'nguyenvana@example.com',
             'phone' => '0901234567',
-            'password' => 'Password123',
-            'password_confirmation' => 'Password123',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
         ]);
 
         $response->assertRedirect(route('verification.notice'));
 
-        $user = User::where('email', 'nguyenvana@example.com')->first();
-        $this->assertNotNull($user);
-        $this->assertNull($user->email_verified_at);
-        $this->assertFalse($user->hasVerifiedEmail());
+        // Chưa nhập mã OTP -> Tuyệt đối CHƯA LƯU vào bảng users và CHƯA ĐĂNG NHẬP
+        $this->assertDatabaseMissing('users', ['email' => 'nguyenvana@example.com']);
+        $this->assertFalse(auth()->check());
 
         Mail::assertSent(EmailVerificationMail::class, function ($mail) {
             return $mail->hasTo('nguyenvana@example.com')
@@ -52,6 +51,33 @@ class AuthEmailVerificationTest extends TestCase
         });
 
         $this->assertDatabaseHas('email_verifications', [
+            'email' => 'nguyenvana@example.com',
+            'action' => 'register',
+        ]);
+
+        $mail = Mail::sent(EmailVerificationMail::class)->first();
+        $code = $mail->code;
+
+        // Thử nhập sai mã -> Vẫn không lưu user
+        $wrongResponse = $this->post(route('verification.verify'), [
+            'code' => '999999',
+        ]);
+        $wrongResponse->assertSessionHasErrors('code');
+        $this->assertDatabaseMissing('users', ['email' => 'nguyenvana@example.com']);
+
+        // Nhập đúng mã OTP -> Lúc này MỚI TẠO USER và TỰ ĐỘNG ĐĂNG NHẬP
+        $verifyResponse = $this->post(route('verification.verify'), [
+            'code' => $code,
+        ]);
+
+        $verifyResponse->assertRedirect(route('home'));
+
+        $user = User::where('email', 'nguyenvana@example.com')->first();
+        $this->assertNotNull($user);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertTrue($user->hasVerifiedEmail());
+        $this->assertTrue(auth()->check());
+        $this->assertDatabaseMissing('email_verifications', [
             'email' => 'nguyenvana@example.com',
             'action' => 'register',
         ]);

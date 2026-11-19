@@ -185,10 +185,9 @@ class OtpSecurityEnhancementTest extends TestCase
         $response->assertRedirect(route('verification.notice'));
         $response->assertSessionHas('warning');
 
-        // Tài khoản vẫn được tạo an toàn trong DB
-        $user = User::where('email', 'mail_fail@haomilk.test')->first();
-        $this->assertNotNull($user);
-        $this->assertNull($user->email_verified_at);
+        // Chưa nhập OTP -> Tài khoản TUYỆT ĐỐI CHƯA LƯU trong DB (chỉ lưu session tạm)
+        $this->assertDatabaseMissing('users', ['email' => 'mail_fail@haomilk.test']);
+        $this->assertEquals('mail_fail@haomilk.test', session('pending_registration.email'));
     }
 
     public function test_forgot_password_flow_with_hashed_otp(): void
