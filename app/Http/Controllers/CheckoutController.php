@@ -92,7 +92,11 @@ class CheckoutController extends Controller
             'Vĩnh Long', 'Vĩnh Phúc', 'Yên Bái',
         ];
 
-        return view('checkout.index', compact('cart', 'user', 'addresses', 'defaultAddress', 'provinces'));
+        $allowCod = ! $cart->items->contains(function ($item) {
+            return ! ($item->product->allow_cod ?? true);
+        });
+
+        return view('checkout.index', compact('cart', 'user', 'addresses', 'defaultAddress', 'provinces', 'allowCod'));
     }
 
     /**
@@ -274,6 +278,17 @@ class CheckoutController extends Controller
                     if (! $variant || $variant->stock_quantity < $item->quantity) {
                         $variantName = $item->variant ? $item->variant->variant_title : '';
                         throw new \DomainException("Sản phẩm '{$item->product->name}' ({$variantName}) không đủ số lượng trong kho.");
+                    }
+                }
+
+                // Kiểm tra phương thức COD đối với sản phẩm chỉ cho phép chuyển khoản
+                if ($paymentMethod === 'cod') {
+                    $nonCodItem = $cartItems->first(function ($item) {
+                        return ! ($item->product->allow_cod ?? true);
+                    });
+
+                    if ($nonCodItem) {
+                        throw new \DomainException("Sản phẩm '{$nonCodItem->product->name}' chỉ hỗ trợ thanh toán chuyển khoản, không áp dụng COD.");
                     }
                 }
 

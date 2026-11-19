@@ -205,7 +205,7 @@
 
                             <!-- Actions -->
                             <td class="py-4 px-6 text-right">
-                                <div class="flex items-center justify-end gap-1.5">
+                                <div class="flex items-center justify-end gap-1.5 flex-wrap">
                                     <a href="{{ route('admin.orders.show', $order) }}" 
                                        class="p-2 rounded-xl bg-slate-100 hover:bg-primary hover:text-white text-slate-600 transition-colors"
                                        title="Xem chi tiết đơn hàng">
@@ -217,6 +217,24 @@
                                        title="In phiếu giao hàng">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                                     </a>
+
+                                    @if($order->order_status !== 'cancelled')
+                                        <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="inline"
+                                              onsubmit="return confirm('Xác nhận hoàn đơn hàng #{{ $order->order_code }}? Toàn bộ sản phẩm trong đơn sẽ được tự động hoàn trả lại kho!')">
+                                            @csrf
+                                            @method('PUT')
+                                            <input type="hidden" name="order_status" value="cancelled">
+                                            <input type="hidden" name="admin_note" value="Hàng bị hoàn về - Quản trị viên hoàn đơn và nhập lại kho.">
+                                            <button type="submit" 
+                                                    class="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white font-bold text-[11px] transition-colors"
+                                                    title="Hoàn đơn hàng (Nhập lại kho)">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                                </svg>
+                                                <span>Hoàn đơn</span>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

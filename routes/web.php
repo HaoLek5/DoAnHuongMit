@@ -156,6 +156,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     // Products
     Route::post('products/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->name('products.toggle-status');
+    Route::post('products/{product}/toggle-cod', [ProductController::class, 'toggleCod'])->name('products.toggle-cod');
     Route::resource('products', ProductController::class);
 
     // Sale Campaigns (Chiến dịch Sale)

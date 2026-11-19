@@ -90,6 +90,7 @@
                         <th class="py-4 px-4 text-center">Tồn kho</th>
                         <th class="py-4 px-4 text-center">Ngày tạo</th>
                         <th class="py-4 px-4 text-center w-28">Trạng thái</th>
+                        <th class="py-4 px-4 text-center w-20">COD</th>
                         <th class="py-4 px-4 text-right w-24">Thao tác</th>
                     </tr>
                 </thead>
@@ -139,8 +140,6 @@
                                         </svg>
                                         {{ $p->variants->count() }} biến thể
                                     </span>
-                                    <span class="text-slate-300">•</span>
-                                    <span class="text-slate-400">Nhấn để xem chi tiết biến thể</span>
                                 </div>
                             </td>
 
@@ -176,12 +175,23 @@
 
                             <!-- Toggle Status Switch -->
                             <td class="py-3 px-4 text-center" @click.stop>
-                                <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <label class="relative inline-flex items-center cursor-pointer select-none" title="Trạng thái hiển thị">
                                     <input type="checkbox" 
                                            {{ $p->status ? 'checked' : '' }}
                                            @change="toggleProductStatus({{ $p->id }}, $event.target)"
                                            class="sr-only peer">
                                     <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </td>
+
+                            <!-- Toggle COD Switch -->
+                            <td class="py-3 px-4 text-center" @click.stop>
+                                <label class="relative inline-flex items-center cursor-pointer select-none" title="Bật/Tắt COD cho sản phẩm này">
+                                    <input type="checkbox" 
+                                           {{ ($p->allow_cod ?? true) ? 'checked' : '' }}
+                                           @change="toggleProductCod({{ $p->id }}, $event.target)"
+                                           class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
                                 </label>
                             </td>
 
@@ -206,7 +216,7 @@
                             x-transition:enter-start="opacity-0 -translate-y-2"
                             x-transition:enter-end="opacity-100 translate-y-0"
                             class="bg-slate-50/70 border-b border-slate-100">
-                            <td colspan="10" class="p-0">
+                            <td colspan="11" class="p-0">
                                 <div class="py-4 px-6 sm:px-12 bg-slate-50/90 border-y border-slate-200/60"
                                      x-data="variantPaginator({{ json_encode($p->variants) }})">
                                     
@@ -219,27 +229,6 @@
                                             <span class="text-[11px] text-slate-400 font-medium">
                                                 (Tổng cộng: <span x-text="variants.length"></span> biến thể)
                                             </span>
-                                        </div>
-
-                                        <!-- Pagination indicator for sub-list (10 per page) -->
-                                        <div x-show="totalPages > 1" class="flex items-center gap-2 text-xs">
-                                            <span class="text-slate-400">
-                                                Trang <span x-text="currentPage" class="font-bold text-slate-700"></span>/<span x-text="totalPages"></span>
-                                            </span>
-                                            <div class="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
-                                                <button type="button" @click="prevPage()" :disabled="currentPage === 1"
-                                                        class="p-1 rounded text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed">
-                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-                                                    </svg>
-                                                </button>
-                                                <button type="button" @click="nextPage()" :disabled="currentPage === totalPages"
-                                                        class="p-1 rounded text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed">
-                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                                                    </svg>
-                                                </button>
-                                            </div>
                                         </div>
                                     </div>
 
@@ -259,7 +248,7 @@
                                                     <tr class="hover:bg-slate-50/80 transition-colors">
                                                         <td class="py-2.5 px-4 text-slate-400 font-mono" x-text="((currentPage - 1) * perPage) + index + 1"></td>
                                                         <td class="py-2.5 px-4">
-                                                            <div class="font-bold text-slate-800" x-text="v.variant_title || 'Mặc định'"></div>
+                                                             <div class="font-bold text-slate-800" x-text="v.variant_title || 'Mặc định'"></div>
                                                             <div class="text-[10px] text-slate-400 mt-0.5" x-show="v.attribute_values && v.attribute_values.length">
                                                                 <template x-for="av in v.attribute_values" :key="av.id">
                                                                     <span class="inline-flex items-center px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 mr-1">
@@ -286,12 +275,33 @@
                                             </tbody>
                                         </table>
                                     </div>
+
+                                    <!-- Pagination indicator for sub-list (10 per page) -->
+                                    <div x-show="totalPages > 1" class="flex items-center justify-end gap-2 text-xs mt-3">
+                                        <span class="text-slate-400">
+                                            Trang <span x-text="currentPage" class="font-bold text-slate-700"></span>/<span x-text="totalPages"></span>
+                                        </span>
+                                        <div class="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
+                                            <button type="button" @click="prevPage()" :disabled="currentPage === 1"
+                                                    class="p-1 rounded text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                                                </svg>
+                                            </button>
+                                            <button type="button" @click="nextPage()" :disabled="currentPage === totalPages"
+                                                    class="p-1 rounded text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed">
+                                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="py-12 text-center text-slate-400">
+                            <td colspan="11" class="py-12 text-center text-slate-400">
                                 <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
                                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -1550,6 +1560,29 @@
                     }
                 } catch (e) {
                     alert('Lỗi cập nhật trạng thái: ' + e.message);
+                    checkbox.checked = !checkbox.checked;
+                }
+            },
+
+            // Toggle Product COD via AJAX
+            async toggleProductCod(productId, checkbox) {
+                try {
+                    const res = await fetch(`/admin/products/${productId}/toggle-cod`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const data = await res.json();
+                    if (!data.success) {
+                        alert(data.message || 'Không thể cập nhật COD.');
+                        checkbox.checked = !checkbox.checked;
+                    }
+                } catch (e) {
+                    alert('Lỗi cập nhật COD: ' + e.message);
                     checkbox.checked = !checkbox.checked;
                 }
             }

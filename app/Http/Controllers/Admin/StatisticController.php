@@ -255,7 +255,7 @@ class StatisticController extends Controller
         $paymentBreakdown = [];
         $methodLabels = [
             'cod' => 'Thanh toán khi nhận hàng (COD)',
-            'bank_transfer' => 'Chuyển khoản ngân hàng',
+            'bank_transfer' => 'Chuyển khoản ngân hàng (VietQR)',
             'vnpay' => 'Cổng thanh toán VNPay',
             'momo' => 'Ví MoMo',
         ];

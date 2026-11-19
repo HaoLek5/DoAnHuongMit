@@ -120,7 +120,7 @@ class OrderController extends Controller
                                 'quantity' => $item->quantity,
                                 'reference_type' => 'order',
                                 'reference_id' => $lockedOrder->id,
-                                'note' => "Quản trị viên hủy đơn hàng #{$lockedOrder->order_code} - Hoàn tồn kho",
+                                'note' => ! empty($validated['admin_note']) ? $validated['admin_note'] : "Quản trị viên hủy đơn hàng #{$lockedOrder->order_code} - Hoàn tồn kho",
                                 'created_by' => Auth::id(),
                                 'created_at' => now(),
                             ]);
@@ -220,7 +220,11 @@ class OrderController extends Controller
 
             $order->refresh();
 
-            return redirect()->back()->with('success', "Đã cập nhật trạng thái đơn hàng thành: '{$order->status_label}'");
+            $msg = ($newStatus === 'cancelled' && ! empty($validated['admin_note']) && str_contains(mb_strtolower($validated['admin_note']), 'hoàn'))
+                ? "Đã hoàn đơn hàng #{$order->order_code} và hoàn trả hàng về kho thành công."
+                : "Đã cập nhật trạng thái đơn hàng thành: '{$order->status_label}'";
+
+            return redirect()->back()->with('success', $msg);
         } catch (\Exception $e) {
             Log::error('Lỗi cập nhật trạng thái đơn: '.$e->getMessage());
 

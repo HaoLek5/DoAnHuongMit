@@ -1,26 +1,28 @@
 @extends('layouts.admin')
 
-@section('title', 'Thống kê & Báo cáo - Hương Mít')
-@section('page_title', 'Thống kê & Báo cáo')
+@section('title', 'Thống kê Doanh thu - Hương Mít')
+@section('page_title', 'Thống kê Doanh thu')
 
 @section('content')
 <div class="space-y-6" x-data="{ customDateOpen: {{ $period === 'custom' ? 'true' : 'false' }} }">
 
-    {{-- Top Filter Bar --}}
-    <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm">
+    {{-- Top Filter Bar: Bộ lọc thời gian tinh gọn --}}
+    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-slate-100 shadow-sm">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-                <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary">
+                <div class="flex items-center gap-2.5">
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-2xl bg-primary/10 text-primary">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </span>
-                    <h2 class="text-xl font-bold text-slate-800 tracking-tight">Báo cáo & Thống kê kinh doanh</h2>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-800 tracking-tight">Báo cáo doanh thu bán hàng</h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Kỳ báo cáo: <span class="font-bold text-primary">{{ $periodLabel }}</span>
+                        </p>
+                    </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-1">
-                    Đang xem thống kê: <span class="font-bold text-primary">{{ $periodLabel }}</span>
-                </p>
             </div>
 
             {{-- Quick Filter Pills --}}
@@ -65,17 +67,17 @@
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 -translate-y-2"
              x-transition:enter-end="opacity-100 translate-y-0"
-             class="mt-5 pt-5 border-t border-slate-100">
+             class="mt-4 pt-4 border-t border-slate-100">
             <form method="GET" action="{{ route('admin.statistics.index') }}" class="flex flex-wrap items-end gap-3">
                 <input type="hidden" name="period" value="custom">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Từ ngày</label>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Từ ngày</label>
                     <input type="date" name="from_date" 
                            value="{{ request('from_date', $startDate->format('Y-m-d')) }}"
                            class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Đến ngày</label>
+                    <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Đến ngày</label>
                     <input type="date" name="to_date" 
                            value="{{ request('to_date', $endDate->format('Y-m-d')) }}"
                            class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
@@ -85,13 +87,13 @@
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                     </svg>
-                    <span>Lọc dữ liệu</span>
+                    <span>Áp dụng lọc</span>
                 </button>
             </form>
         </div>
     </div>
 
-    {{-- 4 Main KPI Cards --}}
+    {{-- 4 Main KPI Cards: 4 Chỉ số Doanh thu then chốt --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Doanh thu thực thu -->
         <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
@@ -159,12 +161,12 @@
                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span>Doanh thu / số đơn thành công</span>
+                    <span>Doanh thu / đơn thành công</span>
                 </div>
             </div>
         </div>
 
-        <!-- Sản phẩm đã bán & Khách mới -->
+        <!-- Sản phẩm đã bán -->
         <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Sản phẩm đã bán</p>
@@ -178,7 +180,7 @@
                 <h3 class="text-2xl font-black text-slate-900 tracking-tight">{{ number_format($totalUnitsSold) }} <span class="text-sm font-semibold text-slate-500">sản phẩm</span></h3>
                 <div class="flex items-center gap-1.5 mt-2 text-xs font-semibold text-emerald-600">
                     <span class="inline-flex items-center justify-center w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">+</span>
-                    <span>{{ number_format($newCustomersCount) }} khách hàng mới đăng ký</span>
+                    <span>{{ number_format($newCustomersCount) }} khách hàng mới</span>
                 </div>
             </div>
         </div>
@@ -189,7 +191,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h3 class="text-base font-bold text-slate-800 tracking-tight">Biểu đồ doanh thu & số lượng đơn hàng</h3>
-                <p class="text-xs text-slate-400 mt-0.5">Biểu diễn diễn biến kinh doanh trong kỳ đã chọn</p>
+                <p class="text-xs text-slate-400 mt-0.5">Biểu diễn tăng trưởng kinh doanh trong kỳ</p>
             </div>
             <div class="flex items-center gap-4 text-xs font-semibold">
                 <div class="flex items-center gap-1.5">
@@ -208,208 +210,114 @@
         </div>
     </div>
 
-    {{-- Grid 2 Columns: Trạng thái đơn hàng & Phương thức thanh toán --}}
+    {{-- 2 Khối Phân tích Doanh thu Trọng tâm: Top Sản Phẩm & Nguồn Tiền Thanh Toán --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {{-- Order Status Breakdown --}}
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-5">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Cơ cấu trạng thái đơn hàng</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Tổng số: {{ number_format($totalOrders) }} đơn hàng</p>
-                </div>
-                <span class="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-bold text-slate-600">
-                    Hủy: {{ $cancelRate }}%
-                </span>
-            </div>
-
-            <div class="space-y-3.5">
-                @forelse($statusBreakdown as $statusKey => $st)
-                    <div>
-                        <div class="flex items-center justify-between text-xs font-semibold mb-1.5">
-                            <span class="flex items-center gap-2 text-slate-700">
-                                <span class="w-2.5 h-2.5 rounded-full {{ $st['color'] }}"></span>
-                                {{ $st['label'] }}
-                            </span>
-                            <span class="text-slate-500">
-                                <strong class="text-slate-900">{{ number_format($st['count']) }}</strong> đơn 
-                                ({{ $st['percentage'] }}%)
-                            </span>
-                        </div>
-                        <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                            <div class="h-full rounded-full {{ $st['color'] }} transition-all duration-500" 
-                                 style="width: {{ $st['percentage'] }}%"></div>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-xs text-slate-400 py-4 text-center">Chưa có đơn hàng nào trong khoảng thời gian này</p>
-                @endforelse
-            </div>
-        </div>
-
-        {{-- Payment Methods Breakdown --}}
-        <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-5">
-            <div>
-                <h3 class="text-base font-bold text-slate-800 tracking-tight">Phương thức thanh toán</h3>
-                <p class="text-xs text-slate-400 mt-0.5">Tỷ trọng thanh toán theo phương thức trong kỳ</p>
-            </div>
-
-            <div class="space-y-4">
-                @forelse($paymentBreakdown as $pm)
-                    <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-white shadow-xs border border-slate-100 flex items-center justify-center text-primary">
-                                @if($pm['key'] === 'cod')
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                                    </svg>
-                                @else
-                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                                    </svg>
-                                @endif
-                            </div>
-                            <div>
-                                <h4 class="text-xs font-bold text-slate-800">{{ $pm['label'] }}</h4>
-                                <p class="text-[11px] text-slate-400">{{ number_format($pm['order_count']) }} đơn hàng ({{ $pm['percentage'] }}%)</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-extrabold text-slate-800">{{ number_format($pm['revenue']) }} đ</span>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-xs text-slate-400 py-4 text-center">Chưa có giao dịch nào trong khoảng thời gian này</p>
-                @endforelse
-            </div>
-        </div>
-
-    </div>
-
-    {{-- Grid 2 Columns: Top Selling Products & Low Stock Alert --}}
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {{-- Top Selling Products --}}
+        {{-- Khối 1: Top 5 sản phẩm bán chạy nhất --}}
         <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 tracking-tight">Top 5 sản phẩm bán chạy nhất</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Xếp hạng theo số lượng bán trong kỳ</p>
+                    <p class="text-xs text-slate-400 mt-0.5">Sản phẩm mang lại sản lượng & doanh thu lớn nhất</p>
                 </div>
-                <a href="{{ route('admin.products.index') }}" class="text-xs font-bold text-primary hover:underline">
-                    Xem tất cả →
+                <a href="{{ route('admin.products.index') }}" class="text-xs font-bold text-primary hover:underline flex items-center gap-1">
+                    <span>Xem sản phẩm</span>
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                 </a>
             </div>
 
             <div class="divide-y divide-slate-100">
                 @forelse($topProducts as $idx => $prod)
-                    <div class="py-3 flex items-center justify-between gap-3">
+                    <div class="py-3.5 flex items-center justify-between gap-3 group">
                         <div class="flex items-center gap-3 min-w-0">
-                            <span class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold {{ $idx === 0 ? 'bg-amber-100 text-amber-700' : ($idx === 1 ? 'bg-slate-200 text-slate-700' : ($idx === 2 ? 'bg-amber-50 text-amber-800' : 'bg-slate-100 text-slate-500')) }}">
+                            <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black {{ $idx === 0 ? 'bg-amber-100 text-amber-700 shadow-xs' : ($idx === 1 ? 'bg-slate-200 text-slate-700' : ($idx === 2 ? 'bg-orange-100 text-orange-800' : 'bg-slate-100 text-slate-500')) }}">
                                 {{ $idx + 1 }}
                             </span>
                             <div class="min-w-0">
-                                <h4 class="text-xs font-bold text-slate-800 truncate">{{ $prod->product_name }}</h4>
-                                <p class="text-[11px] text-slate-400">Đã bán: <strong class="text-emerald-600">{{ number_format($prod->total_qty) }}</strong> cái</p>
+                                <h4 class="text-xs font-bold text-slate-800 truncate group-hover:text-primary transition-colors">
+                                    {{ $prod->product_name }}
+                                </h4>
+                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                    Đã bán: <strong class="text-emerald-600 font-bold">{{ number_format($prod->total_qty) }}</strong> cái
+                                </p>
                             </div>
                         </div>
                         <div class="text-right flex-shrink-0">
-                            <span class="text-xs font-bold text-slate-900">{{ number_format($prod->total_revenue) }} đ</span>
+                            <span class="text-xs font-extrabold text-slate-900 block">{{ number_format($prod->total_revenue) }} đ</span>
+                            <span class="text-[10px] text-slate-400 font-medium">Doanh số</span>
                         </div>
                     </div>
                 @empty
-                    <div class="py-8 text-center text-xs text-slate-400">
-                        Chưa có sản phẩm nào được bán trong giai đoạn này.
+                    <div class="py-12 text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-2">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                            </svg>
+                        </div>
+                        <p class="text-xs text-slate-400 font-medium">Chưa có sản phẩm nào phát sinh doanh thu trong kỳ</p>
                     </div>
                 @endforelse
             </div>
         </div>
 
-        {{-- Low Stock Warnings --}}
+        {{-- Khối 2: Doanh thu theo Phương thức thanh toán --}}
         <div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-4">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Cảnh báo tồn kho sắp hết</h3>
-                    <p class="text-xs text-slate-400 mt-0.5">Biến thể có lượng tồn &le; 10 cần nhập thêm</p>
+                    <h3 class="text-base font-bold text-slate-800 tracking-tight">Doanh thu theo phương thức thanh toán</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Nguồn tiền thu qua COD vs Chuyển khoản VietQR</p>
                 </div>
-                <a href="{{ route('admin.stock-receipts.create') }}" 
-                   class="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-primary text-white text-[11px] font-bold hover:bg-primary/90 transition-all shadow-xs">
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    <span>Tạo phiếu nhập</span>
-                </a>
+                <span class="px-2.5 py-1 rounded-full bg-slate-100 text-[11px] font-bold text-slate-600">
+                    {{ count($paymentBreakdown) }} phương thức
+                </span>
             </div>
 
-            <div class="divide-y divide-slate-100">
-                @forelse($lowStockVariants as $variant)
-                    <div class="py-2.5 flex items-center justify-between gap-3">
-                        <div class="min-w-0">
-                            <h4 class="text-xs font-bold text-slate-800 truncate">
-                                {{ $variant->product->name ?? 'Sản phẩm' }}
-                            </h4>
-                            <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                                <span class="font-mono text-slate-500">Phân loại: {{ $variant->variant_title }}</span>
-                                <span>&bull;</span>
-                                <span>{{ $variant->product->category->name ?? 'Chưa phân loại' }}</span>
+            <div class="space-y-3 pt-1">
+                @forelse($paymentBreakdown as $pm)
+                    <div class="p-4 rounded-2xl bg-slate-50/70 border border-slate-100 hover:border-slate-200 transition-all">
+                        <div class="flex items-center justify-between gap-3 mb-2.5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-2xl {{ $pm['key'] === 'bank_transfer' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600' }} flex items-center justify-center flex-shrink-0">
+                                    @if($pm['key'] === 'bank_transfer')
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                        </svg>
+                                    @endif
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-slate-800">{{ $pm['label'] }}</h4>
+                                    <p class="text-[11px] text-slate-400 mt-0.5">
+                                        <strong class="text-slate-700">{{ number_format($pm['order_count']) }}</strong> đơn hàng
+                                        ({{ $pm['percentage'] }}%)
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-sm font-black text-slate-900 block">{{ number_format($pm['revenue']) }} đ</span>
+                                <span class="text-[10px] font-bold {{ $pm['key'] === 'bank_transfer' ? 'text-indigo-600' : 'text-emerald-600' }}">
+                                    {{ $revenue > 0 ? round(($pm['revenue'] / $revenue) * 100, 1) : 0 }}% doanh thu
+                                </span>
                             </div>
                         </div>
-                        <div class="flex-shrink-0">
-                            @if($variant->stock_quantity <= 0)
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                    Hết hàng (0)
-                                </span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                    Còn {{ $variant->stock_quantity }} cái
-                                </span>
-                            @endif
+                        <div class="w-full h-1.5 rounded-full bg-slate-200/70 overflow-hidden">
+                            <div class="h-full rounded-full {{ $pm['key'] === 'bank_transfer' ? 'bg-indigo-500' : 'bg-emerald-500' }}"
+                                 style="width: {{ $revenue > 0 ? round(($pm['revenue'] / $revenue) * 100, 1) : 0 }}%"></div>
                         </div>
                     </div>
                 @empty
-                    <div class="py-8 text-center text-xs text-emerald-600 font-semibold">
-                        Tất cả sản phẩm hiện đang có mức tồn kho dồi dào (&gt; 10 cái).
+                    <div class="py-12 text-center text-xs text-slate-400">
+                        Chưa có giao dịch thanh toán nào trong kỳ
                     </div>
                 @endforelse
             </div>
         </div>
 
-    </div>
-
-    {{-- Bottom All-time Lifetime Summary --}}
-    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-7 text-white shadow-lg">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-700/60 pb-5">
-            <div>
-                <span class="text-[11px] font-bold uppercase tracking-wider text-rose-300">Toàn cảnh kinh doanh lũy kế</span>
-                <h3 class="text-xl font-bold mt-1 text-white">Tổng quan toàn bộ thời gian của Hương Mít</h3>
-            </div>
-            <a href="{{ route('admin.orders.index') }}" 
-               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all border border-white/10">
-                <span>Quản lý đơn hàng</span>
-                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-                </svg>
-            </a>
-        </div>
-
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 pt-5">
-            <div>
-                <p class="text-xs text-slate-400 font-semibold">Tổng doanh thu lũy kế</p>
-                <h4 class="text-xl font-black text-white mt-1">{{ number_format($allTimeStats['total_revenue']) }} đ</h4>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold">Tổng đơn hàng đã tạo</p>
-                <h4 class="text-xl font-black text-white mt-1">{{ number_format($allTimeStats['total_orders']) }} đơn</h4>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold">Khách hàng đã đăng ký</p>
-                <h4 class="text-xl font-black text-white mt-1">{{ number_format($allTimeStats['total_customers']) }} khách</h4>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-semibold">Sản phẩm trong danh mục</p>
-                <h4 class="text-xl font-black text-white mt-1">{{ number_format($allTimeStats['total_products']) }} món</h4>
-            </div>
-        </div>
     </div>
 
 </div>
@@ -529,4 +437,3 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @endsection
-

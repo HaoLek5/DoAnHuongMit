@@ -114,19 +114,35 @@
 
                         <div class="space-y-2.5">
                             <!-- COD Option -->
-                            <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
-                                   :class="paymentMethod === 'cod' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
-                                <div class="flex items-center gap-3">
-                                    <input type="radio" name="payment_method" value="cod" x-model="paymentMethod"
-                                           class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
-                                    <span class="text-xs sm:text-sm font-bold text-slate-800">Thanh toán khi nhận hàng (COD)</span>
-                                </div>
-                                <template x-if="totalPrice > 400000">
-                                    <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
-                                        Cọc 40% (<span x-text="formatCurrency(depositAmount)"></span>)
+                            <template x-if="allowCod">
+                                <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
+                                       :class="paymentMethod === 'cod' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" name="payment_method" value="cod" x-model="paymentMethod"
+                                               class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
+                                        <span class="text-xs sm:text-sm font-bold text-slate-800">Thanh toán khi nhận hàng (COD)</span>
+                                    </div>
+                                    <template x-if="totalPrice > 400000">
+                                        <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
+                                            Cọc 40% (<span x-text="formatCurrency(depositAmount)"></span>)
+                                        </span>
+                                    </template>
+                                </label>
+                            </template>
+                            <template x-if="!allowCod">
+                                <div class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-slate-200 bg-slate-50 opacity-70 cursor-not-allowed">
+                                    <div class="flex items-center gap-3">
+                                        <input type="radio" disabled class="text-slate-400 h-4 w-4 border-slate-300 cursor-not-allowed">
+                                        <div>
+                                            <span class="text-xs sm:text-sm font-bold text-slate-500 line-through">Thanh toán khi nhận hàng (COD)</span>
+                                            <p class="text-[11px] text-rose-500 font-medium mt-0.5">Sản phẩm trong giỏ hàng chỉ cho phép thanh toán Chuyển khoản</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
+                                        Không hỗ trợ COD
                                     </span>
-                                </template>
-                            </label>
+                                </div>
+                            </template>
 
                             <!-- Bank Transfer (VietQR) Option -->
                             <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
@@ -517,7 +533,8 @@
             addresses: @json($addresses),
             selectedAddressId: {{ $defaultAddress ? $defaultAddress->id : ($addresses->first() ? $addresses->first()->id : 'null') }},
             tempSelectedAddressId: null,
-            paymentMethod: '{{ old('payment_method', 'cod') }}',
+            allowCod: {{ ($allowCod ?? true) ? 'true' : 'false' }},
+            paymentMethod: '{{ old('payment_method', ($allowCod ?? true) ? 'cod' : 'bank_transfer') }}',
             totalPrice: {{ (float) $cart->total_price }},
 
             get isCodWithDeposit() {

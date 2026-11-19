@@ -113,6 +113,7 @@ class ProductController extends Controller
                 'description' => $validated['description'] ?? null,
                 'base_price' => $validated['base_price'],
                 'status' => $request->has('status') ? (bool) $request->input('status') : true,
+                'allow_cod' => $request->has('allow_cod') ? (bool) $request->input('allow_cod') : true,
             ]);
 
             // Handle Image Uploads (Tối đa 5 ảnh)
@@ -280,7 +281,8 @@ class ProductController extends Controller
                 'name' => $validated['name'],
                 'description' => $validated['description'] ?? null,
                 'base_price' => $validated['base_price'],
-                'status' => $request->has('status') ? (bool) $request->input('status') : true,
+                'status' => $request->has('status') ? (bool) $request->input('status') : $product->status,
+                'allow_cod' => $request->has('allow_cod') ? (bool) $request->input('allow_cod') : $product->allow_cod,
             ]);
 
             // 1. Delete removed images from storage and DB
@@ -384,6 +386,21 @@ class ProductController extends Controller
             'success' => true,
             'status' => $product->status,
             'message' => 'Đã '.($product->status ? 'kích hoạt' : 'ẩn').' sản phẩm ['.$product->code.'].',
+        ]);
+    }
+
+    /**
+     * Toggle product COD permission via AJAX
+     */
+    public function toggleCod(Request $request, Product $product): JsonResponse
+    {
+        $product->allow_cod = ! $product->allow_cod;
+        $product->save();
+
+        return response()->json([
+            'success' => true,
+            'allow_cod' => $product->allow_cod,
+            'message' => 'Đã '.($product->allow_cod ? 'bật' : 'tắt').' COD cho sản phẩm ['.$product->code.'].',
         ]);
     }
 

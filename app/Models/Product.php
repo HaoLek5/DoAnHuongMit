@@ -18,11 +18,13 @@ class Product extends Model
         'description',
         'base_price',
         'status',
+        'allow_cod',
     ];
 
     protected $casts = [
         'base_price' => 'decimal:2',
         'status' => 'boolean',
+        'allow_cod' => 'boolean',
     ];
 
     protected $appends = [

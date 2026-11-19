@@ -48,6 +48,22 @@
                 </div>
             @endif
 
+            @if($order->order_status !== 'cancelled')
+                <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="inline"
+                      onsubmit="return confirm('Xác nhận hoàn đơn hàng #{{ $order->order_code }}? Toàn bộ sản phẩm trong đơn sẽ được tự động hoàn trả lại kho!')">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="order_status" value="cancelled">
+                    <input type="hidden" name="admin_note" value="Hàng bị hoàn về - Quản trị viên hoàn đơn nhập kho.">
+                    <button type="submit"
+                            class="px-4 py-2.5 rounded-2xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                            title="Hoàn đơn và nhập lại kho">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                        <span>Hoàn đơn</span>
+                    </button>
+                </form>
+            @endif
+
             <a href="{{ route('admin.orders.print', $order) }}" target="_blank"
                class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
