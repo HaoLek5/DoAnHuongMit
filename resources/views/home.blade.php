@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Hương Mít - Thiên đường cho Mẹ & Bé yêu')
-@section('meta_description', 'Hương Mít - Cung cấp sữa bột dinh dưỡng, tã bỉm, bình sữa và thực phẩm ăn dặm cho mẹ và bé.')
+@section('meta_description', 'Hương Mít')
 
 @section('content')
 
