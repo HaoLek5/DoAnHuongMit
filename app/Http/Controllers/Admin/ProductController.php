@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Category;
+use App\Models\InventoryTransaction;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
@@ -149,12 +150,25 @@ class ProductController extends Controller
             $variantsData = $request->input('variants', []);
             if (! empty($variantsData) && is_array($variantsData)) {
                 foreach ($variantsData as $vData) {
+                    $stock = ! empty($vData['stock_quantity']) ? (int) $vData['stock_quantity'] : 0;
                     $variant = ProductVariant::create([
                         'product_id' => $product->id,
                         'price' => ! empty($vData['price']) ? (float) $vData['price'] : $product->base_price,
                         'cost_price' => ! empty($vData['cost_price']) ? (float) $vData['cost_price'] : null,
-                        'stock_quantity' => ! empty($vData['stock_quantity']) ? (int) $vData['stock_quantity'] : 0,
+                        'stock_quantity' => $stock,
                     ]);
+
+                    if ($stock > 0) {
+                        InventoryTransaction::create([
+                            'variant_id' => $variant->id,
+                            'type' => 'adjustment',
+                            'quantity' => $stock,
+                            'reference_type' => 'manual',
+                            'reference_id' => null,
+                            'note' => 'Kiểm kê cân bằng kho: 0 -> '.$stock.' (+'.$stock.')',
+                            'created_by' => auth()->id(),
+                        ]);
+                    }
 
                     $valueIds = [];
 
@@ -185,12 +199,25 @@ class ProductController extends Controller
                 }
             } else {
                 // Default single variant with base price if no attributes specified
-                ProductVariant::create([
+                $stock = (int) $request->input('default_stock', 0);
+                $variant = ProductVariant::create([
                     'product_id' => $product->id,
                     'price' => $product->base_price,
                     'cost_price' => null,
-                    'stock_quantity' => (int) $request->input('default_stock', 0),
+                    'stock_quantity' => $stock,
                 ]);
+
+                if ($stock > 0) {
+                    InventoryTransaction::create([
+                        'variant_id' => $variant->id,
+                        'type' => 'adjustment',
+                        'quantity' => $stock,
+                        'reference_type' => 'manual',
+                        'reference_id' => null,
+                        'note' => 'Kiểm kê cân bằng kho: 0 -> '.$stock.' (+'.$stock.')',
+                        'created_by' => auth()->id(),
+                    ]);
+                }
             }
 
             DB::commit();
@@ -339,11 +366,27 @@ class ProductController extends Controller
                     if (! empty($vData['id'])) {
                         $variant = ProductVariant::where('product_id', $product->id)->find($vData['id']);
                         if ($variant) {
+                            $oldStock = (int) $variant->stock_quantity;
+                            $newStock = isset($vData['stock_quantity']) ? (int) $vData['stock_quantity'] : $oldStock;
+
                             $variant->update([
                                 'price' => ! empty($vData['price']) ? (float) $vData['price'] : $product->base_price,
                                 'cost_price' => ! empty($vData['cost_price']) ? (float) $vData['cost_price'] : null,
-                                'stock_quantity' => isset($vData['stock_quantity']) ? (int) $vData['stock_quantity'] : $variant->stock_quantity,
+                                'stock_quantity' => $newStock,
                             ]);
+
+                            if ($newStock !== $oldStock) {
+                                $diff = $newStock - $oldStock;
+                                InventoryTransaction::create([
+                                    'variant_id' => $variant->id,
+                                    'type' => 'adjustment',
+                                    'quantity' => $diff,
+                                    'reference_type' => 'manual',
+                                    'reference_id' => null,
+                                    'note' => 'Kiểm kê cân bằng kho: '.$oldStock.' -> '.$newStock.' ('.($diff > 0 ? '+' : '').$diff.')',
+                                    'created_by' => auth()->id(),
+                                ]);
+                            }
                         }
                     }
                 }
