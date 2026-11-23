@@ -116,6 +116,18 @@ class Product extends Model
     }
 
     /**
+     * Hỗ trợ tìm kiếm theo cả ID số và mã SP (SP0001...) khi binding route
+     */
+    public function resolveRouteBindingQuery($query, $value, $field = null)
+    {
+        if (is_string($value) && preg_match('/^SP(\d+)$/i', $value, $matches)) {
+            return $query->where($field ?? $this->getRouteKeyName(), (int) $matches[1]);
+        }
+
+        return parent::resolveRouteBindingQuery($query, $value, $field);
+    }
+
+    /**
      * Mã sản phẩm tiếp theo
      */
     public static function getNextCode(): string

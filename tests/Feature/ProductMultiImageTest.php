@@ -127,4 +127,39 @@ class ProductMultiImageTest extends TestCase
 
         $this->assertCount(2, $response->json('product.images'));
     }
+
+    public function test_product_share_link_and_code_route_binding(): void
+    {
+        $product = Product::create([
+            'category_id' => $this->category->id,
+            'name' => 'Váy bé gái cao cấp',
+            'base_price' => 250000,
+            'status' => true,
+        ]);
+
+        // Kiểm tra truy vấn API sản phẩm qua cả ID số và mã SP (SP0001...)
+        $responseById = $this->getJson("/san-pham/{$product->id}/json");
+        $responseById->assertStatus(200)->assertJson(['success' => true]);
+
+        $responseByCode = $this->getJson("/san-pham/{$product->code}/json");
+        $responseByCode->assertStatus(200)->assertJson([
+            'success' => true,
+            'product' => [
+                'id' => $product->id,
+                'name' => 'Váy bé gái cao cấp',
+            ],
+        ]);
+
+        // Kiểm tra trang chủ hiển thị nút sao chép link
+        $homeResponse = $this->get('/');
+        $homeResponse->assertStatus(200)
+            ->assertSee('copyProductShareLink', false)
+            ->assertSee('Sao chép link', false);
+
+        // Kiểm tra trang quản trị sản phẩm có nút sao chép link
+        $adminResponse = $this->actingAs($this->admin)->get('/admin/products');
+        $adminResponse->assertStatus(200)
+            ->assertSee('copyProductLink', false)
+            ->assertSee('Sao chép link chia sẻ sản phẩm', false);
+    }
 }

@@ -12,7 +12,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
+
             <div class="lg:col-span-7 space-y-5 text-center lg:text-left">
                 <h1 class="text-3xl sm:text-5xl lg:text-5xl font-display font-extrabold text-gray-800 leading-tight">
                     Chăm sóc bé yêu trọn vẹn với <br class="hidden sm:inline">
@@ -20,15 +20,15 @@
                 </h1>
 
                 <!-- Search form embedded in Hero -->
-                <form method="GET" action="{{ route('home') }}#danh-sach-san-pham" 
+                <form method="GET" action="{{ route('home') }}#danh-sach-san-pham"
                       class="pt-2 max-w-lg mx-auto lg:mx-0 flex items-center gap-2 bg-white p-2 rounded-2xl border border-primary-200 shadow-sm focus-within:ring-2 focus-within:ring-primary/20">
                     <div class="pl-2 text-primary">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Tìm kiếm theo tên sữa, tã bỉm, mã SP..." 
+                           placeholder="Tìm kiếm theo tên sữa, tã bỉm, mã SP..."
                            class="flex-1 px-2 py-2 text-xs sm:text-sm text-gray-800 placeholder-gray-400 outline-none bg-transparent">
-                    <button type="submit" 
+                    <button type="submit"
                             class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-primary-600 text-white font-bold text-xs sm:text-sm shadow-xs hover:shadow-md transition-all">
                         Tìm kiếm
                     </button>
@@ -39,8 +39,8 @@
             <div class="lg:col-span-5 flex justify-center">
                 <div class="relative w-full max-w-sm">
                     <div class="w-full aspect-square rounded-3xl bg-gradient-to-br from-primary-100 to-peach-light border-4 border-white shadow-xl overflow-hidden flex items-center justify-center p-3 sm:p-4 group">
-                        <img src="{{ asset('images/hero-mother-baby.jpg') }}" 
-                             alt="Hương Mít - Chăm sóc Mẹ và Bé yêu" 
+                        <img src="{{ asset('images/hero-mother-baby.jpg') }}"
+                             alt="Hương Mít - Chăm sóc Mẹ và Bé yêu"
                              class="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500">
                     </div>
                 </div>
@@ -62,7 +62,7 @@
         </div>
 
         @if(request('category_id') || request('search'))
-            <a href="{{ route('home') }}#danh-sach-san-pham" 
+            <a href="{{ route('home') }}#danh-sach-san-pham"
                class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
                 <span>Bỏ lọc tất cả</span>
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -71,7 +71,7 @@
     </div>
 
     <!-- Category Pills Container with Hover Scrollbar & Navigation -->
-    <div class="relative group" 
+    <div class="relative group"
          x-data="{
              canScrollLeft: false,
              canScrollRight: false,
@@ -101,7 +101,7 @@
          x-init="$nextTick(() => { checkScroll(); }); window.addEventListener('resize', () => checkScroll());">
 
         <!-- Left Navigation Arrow (shown on group hover when scrollable) -->
-        <button type="button" 
+        <button type="button"
                 x-show="canScrollLeft"
                 x-cloak
                 @click="scroll('left')"
@@ -113,7 +113,7 @@
         </button>
 
         <!-- Right Navigation Arrow (shown on group hover when scrollable) -->
-        <button type="button" 
+        <button type="button"
                 x-show="canScrollRight"
                 x-cloak
                 @click="scroll('right')"
@@ -152,14 +152,14 @@
 </section>
 
 {{-- ── PRODUCTS SECTION (SEARCH, SORT & CARDS LIST) ── --}}
-<section id="danh-sach-san-pham" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mb-16" 
+<section id="danh-sach-san-pham" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mb-16"
          x-data="shopManager()"
          @view-product.window="openProductModal($event.detail.id, false)">
 
     <!-- Filter & Sort Bar -->
     <div class="bg-white rounded-3xl p-4 sm:p-5 border border-primary-100/80 shadow-xs mb-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            
+
             <!-- Result Title / Active Filter -->
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-primary-50 text-primary flex items-center justify-center">
@@ -191,7 +191,7 @@
                 <!-- Inline Search -->
                 <div class="relative min-w-[200px]">
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Lọc theo tên SP..." 
+                           placeholder="Lọc theo tên SP..."
                            class="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 text-xs text-gray-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     <svg class="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -235,11 +235,11 @@
                 <div id="san-pham-{{ $p->id }}"
                      class="group bg-white rounded-3xl border border-slate-200/80 hover:border-primary-300 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden cursor-pointer"
                      @click="openProductModal({{ $p->id }})">
-                    
+
                     <!-- Card Thumbnail Header -->
                     <div class="relative w-full aspect-square bg-milk overflow-hidden flex items-center justify-center p-3">
                         @if($p->primary_image_url)
-                            <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}" 
+                            <img src="{{ $p->primary_image_url }}" alt="{{ $p->name }}"
                                  class="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300">
                         @else
                             <div class="w-full h-full rounded-2xl bg-primary-50/50 flex items-center justify-center text-primary/40">
@@ -258,10 +258,27 @@
 
                         <!-- Variants Count Badge -->
                         @if($p->variants->count() > 1)
-                            <span class="absolute top-3 right-3 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-900/80 backdrop-blur-xs text-white shadow-xs">
+                            <span class="absolute bottom-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-slate-900/80 backdrop-blur-xs text-white shadow-xs pointer-events-none">
                                 {{ $p->variants->count() }} phân loại
                             </span>
                         @endif
+
+                        <!-- Copy Link Button -->
+                        <button type="button"
+                                @click.stop="copyProductShareLink({{ $p->id }}, '{{ addslashes($p->name) }}')"
+                                title="Sao chép link chia sẻ sản phẩm"
+                                class="absolute top-3 right-3 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-primary shadow-sm hover:shadow-md border border-slate-200/80 flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer">
+                            <template x-if="copiedProductId === {{ $p->id }}">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </template>
+                            <template x-if="copiedProductId !== {{ $p->id }}">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </template>
+                        </button>
                     </div>
 
                     <!-- Card Body -->
@@ -349,11 +366,11 @@
 
     {{-- ── PRODUCT QUICK-VIEW & VARIANT SELECTION POPUP ── --}}
     <template x-teleport="body">
-        <div x-show="modalOpen" 
+        <div x-show="modalOpen"
              x-cloak
              class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 sm:p-6"
              role="dialog" aria-modal="true">
-            
+
             <!-- Backdrop -->
             <div x-show="modalOpen"
                  x-transition:enter="ease-out duration-200"
@@ -374,7 +391,7 @@
                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                  x-transition:leave-end="opacity-0 scale-95 translate-y-2"
                  class="relative bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-primary-100 overflow-hidden z-10 max-h-[90vh] flex flex-col">
-                
+
                 <!-- Close Button -->
                 <button type="button" @click="closeModal()"
                         class="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-primary-50 text-gray-500 hover:text-primary flex items-center justify-center shadow-sm border border-slate-200 transition-all">
@@ -390,13 +407,13 @@
                 <!-- Modal Content when loaded -->
                 <div x-show="!loading && currentProduct" class="overflow-y-auto p-6 sm:p-8">
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 items-start">
-                        
+
                         <!-- Left: Images Gallery & Description (5 cols) -->
                         <div class="md:col-span-5 space-y-3">
                             <div @click="openZoom()"
                                  title="Nhấn để phóng to ảnh"
                                  class="w-full aspect-square rounded-2xl bg-milk border border-slate-200/80 overflow-hidden flex items-center justify-center p-2 shadow-xs relative group cursor-zoom-in">
-                                <img :src="activeImage" :alt="currentProduct?.name" 
+                                <img :src="activeImage" :alt="currentProduct?.name"
                                      class="w-full h-full object-cover rounded-xl transition-all duration-300 group-hover:scale-[1.02]">
 
                                 <!-- Hover Badge / Zoom prompt -->
@@ -437,11 +454,38 @@
 
                         <!-- Right: Info, Variant Options, Quantity, Actions (7 cols) -->
                         <div class="md:col-span-7 space-y-4">
-                            
-                            <!-- Badges -->
-                            <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary-100 text-primary"
-                                      x-text="currentProduct?.category?.name || 'Mẹ & Bé'"></span>
+
+                            <!-- Badges & Copy Share Link -->
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-primary-100 text-primary"
+                                          x-text="currentProduct?.category?.name || 'Mẹ & Bé'"></span>
+                                    <span class="text-[10px] text-slate-400 font-mono font-medium"
+                                          x-text="currentProduct?.code || ('SP' + String(currentProduct?.id || '').padStart(4, '0'))"></span>
+                                </div>
+
+                                <!-- Nút sao chép link chia sẻ -->
+                                <button type="button"
+                                        @click="copyProductShareLink(currentProduct?.id, currentProduct?.name)"
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-primary-50 hover:border-primary-300 text-slate-600 hover:text-primary text-xs font-semibold shadow-xs transition-all active:scale-95 cursor-pointer"
+                                        title="Sao chép link chia sẻ sản phẩm">
+                                    <template x-if="copiedProductId === currentProduct?.id">
+                                        <div class="inline-flex items-center gap-1 text-emerald-600 font-bold">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            <span>Đã sao chép!</span>
+                                        </div>
+                                    </template>
+                                    <template x-if="copiedProductId !== currentProduct?.id">
+                                        <div class="inline-flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                            </svg>
+                                            <span>Sao chép link</span>
+                                        </div>
+                                    </template>
+                                </button>
                             </div>
 
                             <!-- Title -->
@@ -513,8 +557,8 @@
                                             <template x-for="val in attr.values" :key="val">
                                                 <button type="button" @click="selectOption(attr.id, val)"
                                                         class="px-3.5 py-1.5 rounded-xl text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5"
-                                                        :class="selectedOptions[attr.id] === val 
-                                                            ? 'border-primary bg-primary text-white shadow-xs font-bold' 
+                                                        :class="selectedOptions[attr.id] === val
+                                                            ? 'border-primary bg-primary text-white shadow-xs font-bold'
                                                             : 'border-slate-200 bg-white hover:border-primary-300 text-gray-700 hover:bg-primary-50/50'">
                                                     <span x-text="val"></span>
                                                     <svg x-show="selectedOptions[attr.id] === val" class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -542,7 +586,7 @@
                                             class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-primary-50 hover:text-primary disabled:opacity-30">
                                         -
                                     </button>
-                                    <input type="number" x-model.number="quantity" min="1" 
+                                    <input type="number" x-model.number="quantity" min="1"
                                            :max="selectedVariant?.stock_quantity || 99"
                                            class="w-12 text-center text-xs font-bold text-gray-800 outline-none border-x border-slate-200 py-1">
                                     <button type="button" @click="if (!selectedVariant || quantity < selectedVariant.stock_quantity) quantity++"
@@ -587,7 +631,7 @@
 
     {{-- ── FULLSCREEN IMAGE ZOOM & LIGHTBOX MODAL ── --}}
     <template x-teleport="body">
-        <div x-show="zoomOpen" 
+        <div x-show="zoomOpen"
              x-cloak
              x-transition:enter="ease-out duration-200"
              x-transition:enter-start="opacity-0"
@@ -616,8 +660,8 @@
                 <!-- Controls -->
                 <div class="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                     <!-- Zoom Out -->
-                    <button type="button" 
-                            @click="zoomOut()" 
+                    <button type="button"
+                            @click="zoomOut()"
                             :disabled="zoomLevel <= 1"
                             title="Thu nhỏ (-)"
                             class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-30 disabled:hover:bg-white/10 text-white flex items-center justify-center transition-all cursor-pointer">
@@ -627,16 +671,16 @@
                     </button>
 
                     <!-- Zoom Level Pill / Reset -->
-                    <button type="button" 
-                            @click="resetZoom()" 
+                    <button type="button"
+                            @click="resetZoom()"
                             title="Đặt lại kích thước (100%)"
                             class="px-3 h-9 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white text-xs font-mono font-bold flex items-center justify-center transition-all cursor-pointer">
                         <span x-text="Math.round(zoomLevel * 100) + '%'"></span>
                     </button>
 
                     <!-- Zoom In -->
-                    <button type="button" 
-                            @click="zoomIn()" 
+                    <button type="button"
+                            @click="zoomIn()"
                             :disabled="zoomLevel >= 4"
                             title="Phóng to (+)"
                             class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 disabled:opacity-30 disabled:hover:bg-white/10 text-white flex items-center justify-center transition-all cursor-pointer">
@@ -648,8 +692,8 @@
                     <div class="h-6 w-px bg-white/20 mx-1"></div>
 
                     <!-- Close Button -->
-                    <button type="button" 
-                            @click="closeZoom()" 
+                    <button type="button"
+                            @click="closeZoom()"
                             title="Đóng (Esc)"
                             class="w-9 h-9 rounded-xl bg-white/10 hover:bg-rose-500/80 active:scale-95 text-white flex items-center justify-center transition-all cursor-pointer">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -664,9 +708,9 @@
                  @click="handleBackdropClick($event)">
 
                 <!-- Prev Button -->
-                <button type="button" 
+                <button type="button"
                         x-show="getImageList().length > 1"
-                        @click.stop="prevImage()" 
+                        @click.stop="prevImage()"
                         class="absolute left-3 sm:left-6 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white/90 hover:text-white backdrop-blur-xs flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer"
                         title="Ảnh trước (←)">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -675,9 +719,9 @@
                 </button>
 
                 <!-- Next Button -->
-                <button type="button" 
+                <button type="button"
                         x-show="getImageList().length > 1"
-                        @click.stop="nextImage()" 
+                        @click.stop="nextImage()"
                         class="absolute right-3 sm:right-6 z-20 w-11 h-11 rounded-full bg-black/50 hover:bg-black/80 text-white/90 hover:text-white backdrop-blur-xs flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 cursor-pointer"
                         title="Ảnh tiếp theo (→)">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -695,8 +739,8 @@
                      @touchstart="handleTouchStart($event)"
                      @touchmove="handleTouchMove($event)"
                      @touchend="handleTouchEnd()">
-                    
-                    <img :src="activeImage" 
+
+                    <img :src="activeImage"
                          :alt="currentProduct?.name"
                          @click.stop="toggleZoomClick($event)"
                          :style="`transform: translate(${panX}px, ${panY}px) scale(${zoomLevel}); cursor: ${zoomLevel > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in'};`"
@@ -716,7 +760,7 @@
                  x-show="getImageList().length > 1">
                 <div class="flex items-center gap-2 overflow-x-auto max-w-full py-1 px-2">
                     <template x-for="(img, idx) in getImageList()" :key="img.id || idx">
-                        <button type="button" 
+                        <button type="button"
                                 @click.stop="selectZoomImage(img.image_url)"
                                 class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 overflow-hidden flex-shrink-0 transition-all p-0.5 cursor-pointer"
                                 :class="activeImage === img.image_url ? 'border-primary ring-2 ring-primary/50 scale-105' : 'border-white/30 hover:border-white/70 opacity-70 hover:opacity-100'">
@@ -741,6 +785,7 @@ function shopManager() {
         loading: false,
         isSubmitting: false,
         isBuyNow: false,
+        copiedProductId: null,
 
         currentProduct: null,
         groupedAttributes: [],
@@ -762,6 +807,68 @@ function shopManager() {
         hasDragged: false,
         lastTouchDistance: 0,
 
+        init() {
+            // Tự động mở modal sản phẩm nếu URL có tham số chia sẻ ?product=... hoặc ?sp=... hoặc hash #san-pham-...
+            const params = new URLSearchParams(window.location.search);
+            let productId = params.get('product') || params.get('sp');
+            if (!productId && window.location.hash && window.location.hash.startsWith('#san-pham-')) {
+                productId = window.location.hash.replace('#san-pham-', '');
+            }
+            if (productId) {
+                this.$nextTick(() => {
+                    this.openProductModal(productId, false);
+                    const el = document.getElementById(`san-pham-${productId}`) || document.getElementById('danh-sach-san-pham');
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        },
+
+        copyProductShareLink(productId, productName = '') {
+            if (!productId) return;
+            const url = `${window.location.origin}/?product=${productId}#san-pham-${productId}`;
+
+            const finishCopy = () => {
+                this.copiedProductId = productId;
+                setTimeout(() => {
+                    if (this.copiedProductId === productId) {
+                        this.copiedProductId = null;
+                    }
+                }, 2500);
+
+                window.dispatchEvent(new CustomEvent('show-toast', {
+                    detail: { message: `Đã sao chép link chia sẻ: ${productName || ('Sản phẩm #' + productId)}` }
+                }));
+            };
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url)
+                    .then(finishCopy)
+                    .catch(() => this.fallbackCopyText(url, finishCopy));
+            } else {
+                this.fallbackCopyText(url, finishCopy);
+            }
+        },
+
+        fallbackCopyText(text, callback) {
+            try {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (typeof callback === 'function') callback();
+            } catch (e) {
+                prompt('Sao chép liên kết sản phẩm bên dưới:', text);
+            }
+        },
+
         formatCurrency(num) {
             return new Intl.NumberFormat('vi-VN').format(num || 0) + ' đ';
         },
@@ -781,7 +888,7 @@ function shopManager() {
                     headers: { 'Accept': 'application/json' }
                 });
                 const data = await res.json();
-                
+
                 if (!data.success || !data.product) {
                     alert(data.message || 'Không thể tải thông tin sản phẩm.');
                     this.closeModal();
@@ -790,10 +897,10 @@ function shopManager() {
 
                 this.currentProduct = data.product;
                 this.groupedAttributes = data.grouped_attributes || [];
-                
+
                 // Set default image
-                this.activeImage = (data.product.primary_image && data.product.primary_image.image_url) 
-                    ? data.product.primary_image.image_url 
+                this.activeImage = (data.product.primary_image && data.product.primary_image.image_url)
+                    ? data.product.primary_image.image_url
                     : (data.product.images && data.product.images.length ? data.product.images[0].image_url : '');
 
                 // Automatically select first available variant combination
@@ -807,6 +914,13 @@ function shopManager() {
                     this.matchSelectedVariant();
                 }
 
+                // Cập nhật tham số URL ?product=... để tiện chia sẻ từ thanh địa chỉ
+                try {
+                    const url = new URL(window.location);
+                    url.searchParams.set('product', productId);
+                    window.history.replaceState({}, '', url);
+                } catch (err) {}
+
             } catch (e) {
                 alert('Lỗi: ' + e.message);
                 this.closeModal();
@@ -818,6 +932,12 @@ function shopManager() {
         closeModal() {
             this.closeZoom();
             this.modalOpen = false;
+            try {
+                const url = new URL(window.location);
+                url.searchParams.delete('product');
+                url.searchParams.delete('sp');
+                window.history.replaceState({}, '', url);
+            } catch (err) {}
         },
 
         // Zoom & Lightbox Controls
@@ -1013,7 +1133,7 @@ function shopManager() {
             // Find variant that matches all selectedOptions
             const match = this.currentProduct.variants.find(variant => {
                 if (!variant.attribute_values || variant.attribute_values.length === 0) return false;
-                
+
                 return Object.entries(this.selectedOptions).every(([attrId, optVal]) => {
                     return variant.attribute_values.some(av => av.attribute_id == attrId && av.value == optVal);
                 });

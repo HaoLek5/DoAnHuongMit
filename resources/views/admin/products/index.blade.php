@@ -9,7 +9,7 @@
     <!-- Top Action Bar: Search, Filters & Add Product Button -->
     <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
         <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            
+
             <!-- Search & Filters Form -->
             <form method="GET" action="{{ route('admin.products.index') }}" class="flex-1 flex flex-wrap items-center gap-3">
                 <!-- Search input (name or code SP0001) -->
@@ -19,14 +19,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Tìm theo tên hoặc mã SP (vd: SP0001, Bobby...)" 
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Tìm theo tên hoặc mã SP (vd: SP0001, Bobby...)"
                            class="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-200 text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                 </div>
 
                 <!-- Category filter -->
                 <div class="w-48">
-                    <select name="category_id" 
+                    <select name="category_id"
                             class="w-full px-3 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-700 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                         <option value="">Tất cả danh mục</option>
                         @foreach($categories as $c)
@@ -39,7 +39,7 @@
 
                 <!-- Status filter -->
                 <div class="w-36">
-                    <select name="status" 
+                    <select name="status"
                             class="w-full px-3 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-700 bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                         <option value="">Tất cả trạng thái</option>
                         <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Đang bán</option>
@@ -48,7 +48,7 @@
                 </div>
 
                 <!-- Search button -->
-                <button type="submit" 
+                <button type="submit"
                         class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
@@ -57,7 +57,7 @@
                 </button>
 
                 @if(request()->hasAny(['search', 'category_id', 'status']))
-                    <a href="{{ route('admin.products.index') }}" 
+                    <a href="{{ route('admin.products.index') }}"
                        class="px-3 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-medium transition-all">
                         Đặt lại
                     </a>
@@ -65,7 +65,7 @@
             </form>
 
             <!-- Add Product Button -->
-            <button @click="openCreateModal()" 
+            <button @click="openCreateModal()"
                     class="px-5 py-3 rounded-2xl bg-gradient-to-r from-primary to-rose-500 hover:from-primary-600 hover:to-rose-600 text-white font-semibold text-xs tracking-wide shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -99,7 +99,7 @@
                         <!-- Parent Product Row -->
                         <tr class="hover:bg-slate-50/80 transition-colors group cursor-pointer"
                             @click="toggleExpand({{ $p->id }})">
-                            
+
                             <!-- Expand icon -->
                             <td class="py-3 px-4 text-center">
                                 <button type="button" class="w-6 h-6 rounded-lg bg-slate-100 group-hover:bg-primary/10 text-slate-400 group-hover:text-primary flex items-center justify-center transition-all"
@@ -176,7 +176,7 @@
                             <!-- Toggle Status Switch -->
                             <td class="py-3 px-4 text-center" @click.stop>
                                 <label class="relative inline-flex items-center cursor-pointer select-none" title="Trạng thái hiển thị">
-                                    <input type="checkbox" 
+                                    <input type="checkbox"
                                            {{ $p->status ? 'checked' : '' }}
                                            @change="toggleProductStatus({{ $p->id }}, $event.target)"
                                            class="sr-only peer">
@@ -187,7 +187,7 @@
                             <!-- Toggle COD Switch -->
                             <td class="py-3 px-4 text-center" @click.stop>
                                 <label class="relative inline-flex items-center cursor-pointer select-none" title="Bật/Tắt COD cho sản phẩm này">
-                                    <input type="checkbox" 
+                                    <input type="checkbox"
                                            {{ ($p->allow_cod ?? true) ? 'checked' : '' }}
                                            @change="toggleProductCod({{ $p->id }}, $event.target)"
                                            class="sr-only peer">
@@ -198,8 +198,19 @@
                             <!-- Edit & Actions -->
                             <td class="py-3 px-4 text-right" @click.stop>
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <button type="button" 
-                                            @click="openEditModal({{ $p->id }})" 
+                                    <!-- Sao chép link sản phẩm -->
+                                    <button type="button"
+                                            @click="copyProductLink({{ $p->id }}, '{{ addslashes($p->name) }}')"
+                                            title="Sao chép link chia sẻ sản phẩm"
+                                            class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-600 flex items-center justify-center transition-all shadow-sm cursor-pointer">
+                                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                        </svg>
+                                    </button>
+
+                                    <!-- Chỉnh sửa sản phẩm -->
+                                    <button type="button"
+                                            @click="openEditModal({{ $p->id }})"
                                             title="Chỉnh sửa sản phẩm"
                                             class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-primary hover:text-white text-slate-600 flex items-center justify-center transition-all shadow-sm">
                                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,7 +222,7 @@
                         </tr>
 
                         <!-- Child Variants Sub-table (Accordion) -->
-                        <tr x-show="isExpanded({{ $p->id }})" 
+                        <tr x-show="isExpanded({{ $p->id }})"
                             x-transition:enter="transition ease-out duration-200"
                             x-transition:enter-start="opacity-0 -translate-y-2"
                             x-transition:enter-end="opacity-100 translate-y-0"
@@ -219,7 +230,7 @@
                             <td colspan="11" class="p-0">
                                 <div class="py-4 px-6 sm:px-12 bg-slate-50/90 border-y border-slate-200/60"
                                      x-data="variantPaginator({{ json_encode($p->variants) }})">
-                                    
+
                                     <div class="flex items-center justify-between mb-3">
                                         <div class="flex items-center gap-2">
                                             <span class="w-2 h-2 rounded-full bg-primary"></span>
@@ -329,7 +340,7 @@
     <!-- Dùng x-teleport="body" để lớp phủ đen trùm 100% toàn màn hình  -->
     <!-- ============================================================== -->
     <template x-teleport="body">
-        <div x-show="modalOpen" 
+        <div x-show="modalOpen"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
@@ -340,7 +351,7 @@
              style="display: none;">
 
             <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col max-h-[92vh]">
-                
+
                 <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
                     <div class="flex items-center gap-3">
@@ -370,7 +381,7 @@
 
                     <!-- Section 1: Thông tin cơ bản -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                        
+
                         <!-- Mã sản phẩm (Tự sinh & không được sửa) -->
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">
@@ -395,7 +406,7 @@
 
                     <!-- Section 2: Danh mục & Giá chung -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
-                        
+
                         <!-- Danh mục (Dropdown có nút sửa bên cạnh & tùy chọn cuối là thêm danh mục) -->
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">
@@ -414,7 +425,7 @@
                                 </select>
 
                                 <!-- Nút sửa danh mục đã chọn -->
-                                <button type="button" @click="openEditCategoryModal()" 
+                                <button type="button" @click="openEditCategoryModal()"
                                         :disabled="!form.category_id || form.category_id === '__NEW_CATEGORY__'"
                                         title="Chỉnh sửa danh mục đang chọn"
                                         class="p-2.5 rounded-2xl border border-slate-200 hover:border-primary hover:bg-primary/10 text-slate-600 hover:text-primary disabled:opacity-30 disabled:pointer-events-none transition-all">
@@ -439,8 +450,8 @@
                             <label class="block text-xs font-bold text-slate-700 mb-1.5">
                                 Giá chung ban đầu (VNĐ) <span class="text-primary">*</span>
                             </label>
-                            <input type="text" 
-                                   :value="formatCurrencyInput(form.base_price)" 
+                            <input type="text"
+                                   :value="formatCurrencyInput(form.base_price)"
                                    @input="onBasePriceInput($event)"
                                    placeholder="230.000"
                                    class="w-full px-3.5 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
@@ -467,7 +478,7 @@
                                 <div class="relative group aspect-square rounded-2xl bg-slate-100 border-2 overflow-hidden shadow-xs transition-all"
                                      :class="img.is_primary ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200 hover:border-slate-300'">
                                     <img :src="img.image_url" class="w-full h-full object-cover">
-                                    
+
                                     <!-- Primary Badge or Set Primary Button -->
                                     <div class="absolute top-1.5 left-1.5 z-10">
                                         <template x-if="img.is_primary">
@@ -500,7 +511,7 @@
                                 <div class="relative group aspect-square rounded-2xl bg-slate-100 border-2 overflow-hidden shadow-xs transition-all"
                                      :class="img.is_primary ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200 hover:border-slate-300'">
                                     <img :src="img.previewUrl" class="w-full h-full object-cover">
-                                    
+
                                     <!-- Primary Badge or Set Primary Button -->
                                     <div class="absolute top-1.5 left-1.5 z-10">
                                         <template x-if="img.is_primary">
@@ -562,7 +573,7 @@
                             </div>
 
                             <!-- Nút thêm thuộc tính: CHỈ HIỆN KHI THÊM MỚI -->
-                            <button type="button" x-show="!isEditMode" @click="addAttributeRow()" 
+                            <button type="button" x-show="!isEditMode" @click="addAttributeRow()"
                                     class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-primary/10 text-slate-700 hover:text-primary text-xs font-bold transition-all flex items-center gap-1.5">
                                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
@@ -586,7 +597,7 @@
                                     <div class="flex items-center gap-2">
                                         <!-- Dropdown Attribute: Mặc định là "-- Chọn thuộc tính --" -->
                                         <div class="w-56">
-                                            <select x-model="row.attribute_id" 
+                                            <select x-model="row.attribute_id"
                                                     :disabled="isEditMode"
                                                     @change="handleAttributeSelect(rIndex, $event)"
                                                     class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed">
@@ -612,7 +623,7 @@
 
                                         <!-- Value tag input: Type and press Enter (CHỈ HIỆN KHI THÊM MỚI) -->
                                         <div class="flex-1 relative" x-show="!isEditMode">
-                                            <input type="text" x-model="row.inputValue" 
+                                            <input type="text" x-model="row.inputValue"
                                                    @keydown.enter.prevent="addTagValue(rIndex)"
                                                    placeholder="Nhập giá trị rồi nhấn Enter... (vd: Vani, 800g)"
                                                    :disabled="!row.attribute_id"
@@ -681,8 +692,8 @@
                                             </td>
                                             <!-- Giá bán tự format 230.000 -->
                                             <td class="py-2 px-3">
-                                                <input type="text" 
-                                                       :value="formatCurrencyInput(gv.price)" 
+                                                <input type="text"
+                                                       :value="formatCurrencyInput(gv.price)"
                                                        @input="onVariantPriceInput(gv, $event)"
                                                        placeholder="230.000"
                                                        class="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs text-slate-800 font-bold focus:ring-1 focus:ring-primary focus:border-primary outline-none">
@@ -733,7 +744,7 @@
     <!-- Thoát không cần thông báo, quay lại luôn form thêm sản phẩm    -->
     <!-- ============================================================== -->
     <template x-teleport="body">
-        <div x-show="categoryModalOpen" 
+        <div x-show="categoryModalOpen"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
@@ -782,7 +793,7 @@
     <!-- Thoát không cần thông báo, quay lại luôn form thêm sản phẩm    -->
     <!-- ============================================================== -->
     <template x-teleport="body">
-        <div x-show="attributeModalOpen" 
+        <div x-show="attributeModalOpen"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
@@ -1202,8 +1213,8 @@
                 this.categorySaving = true;
 
                 try {
-                    const url = this.categoryForm.id 
-                        ? `/admin/categories/${this.categoryForm.id}` 
+                    const url = this.categoryForm.id
+                        ? `/admin/categories/${this.categoryForm.id}`
                         : '/admin/categories';
                     const method = this.categoryForm.id ? 'PUT' : 'POST';
 
@@ -1304,8 +1315,8 @@
                 this.attributeSaving = true;
 
                 try {
-                    const url = this.attributeForm.id 
-                        ? `/admin/attributes/${this.attributeForm.id}` 
+                    const url = this.attributeForm.id
+                        ? `/admin/attributes/${this.attributeForm.id}`
                         : '/admin/attributes';
                     const method = this.attributeForm.id ? 'PUT' : 'POST';
 
@@ -1584,6 +1595,42 @@
                 } catch (e) {
                     alert('Lỗi cập nhật COD: ' + e.message);
                     checkbox.checked = !checkbox.checked;
+                }
+            },
+
+            // Sao chép link sản phẩm ra website bán hàng
+            copyProductLink(productId, productName) {
+                const url = `${window.location.origin}/?product=${productId}#san-pham-${productId}`;
+                const finishCopy = () => {
+                    window.dispatchEvent(new CustomEvent('show-toast', {
+                        detail: { message: `Đã sao chép link chia sẻ: ${productName || ('Sản phẩm #' + productId)}` }
+                    }));
+                };
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(url)
+                        .then(finishCopy)
+                        .catch(() => this.fallbackCopyText(url, finishCopy));
+                } else {
+                    this.fallbackCopyText(url, finishCopy);
+                }
+            },
+
+            fallbackCopyText(text, callback) {
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-999999px';
+                    textArea.style.top = '-999999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    if (typeof callback === 'function') callback();
+                } catch (e) {
+                    prompt('Sao chép liên kết sản phẩm bên dưới:', text);
                 }
             }
         };

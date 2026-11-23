@@ -39,24 +39,37 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('styles')
 </head>
-<body class="h-full antialiased text-slate-800" x-data="{ sidebarOpen: false }">
+<body class="h-full antialiased text-slate-800"
+      x-data="{
+          sidebarOpen: false,
+          toastVisible: false,
+          toastMessage: '',
+          toastTimeout: null,
+          showToast(msg) {
+              this.toastMessage = msg;
+              this.toastVisible = true;
+              clearTimeout(this.toastTimeout);
+              this.toastTimeout = setTimeout(() => { this.toastVisible = false; }, 3500);
+          }
+      }"
+      @show-toast.window="showToast($event.detail?.message)">
 
     <!-- Mobile Sidebar Backdrop -->
-    <div x-show="sidebarOpen" 
+    <div x-show="sidebarOpen"
          x-transition:enter="transition-opacity ease-linear duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="transition-opacity ease-linear duration-300"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden" 
+         class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden"
          @click="sidebarOpen = false" style="display: none;"></div>
 
     <div class="flex h-full">
         <!-- Sidebar Navigation -->
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" 
+        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
                class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col shadow-2xl">
-            
+
             <!-- Brand Logo -->
             <div class="h-20 flex items-center justify-between px-6 border-b border-slate-800">
                 <a href="{{ route('admin.statistics.index') }}" class="flex items-center gap-3 group">
@@ -79,7 +92,7 @@
             <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
                 <div class="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">Bảng điều khiển</div>
 
-                <a href="{{ route('admin.statistics.index') }}" 
+                <a href="{{ route('admin.statistics.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.statistics.*') || request()->routeIs('admin.dashboard') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
@@ -89,7 +102,7 @@
 
                 <div class="pt-5 px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">Quản lý bán hàng</div>
 
-                <a href="{{ route('admin.products.index') }}" 
+                <a href="{{ route('admin.products.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.products.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -97,14 +110,14 @@
                     <span>Sản phẩm</span>
                 </a>
 
-                <a href="{{ route('admin.sale-campaigns.index') }}" 
+                <a href="{{ route('admin.sale-campaigns.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.sale-campaigns.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
                     </svg>
                     <span>Chiến dịch Sale</span>
-                    @php 
-                        $runningSaleCount = \App\Models\SaleCampaign::running()->count(); 
+                    @php
+                        $runningSaleCount = \App\Models\SaleCampaign::running()->count();
                     @endphp
                     @if($runningSaleCount > 0)
                         <span class="ml-auto text-[10px] font-bold bg-amber-500 text-white px-2 py-0.5 rounded-full shadow-xs flex items-center gap-0.5">
@@ -113,7 +126,7 @@
                     @endif
                 </a>
 
-                <a href="{{ route('admin.stock-receipts.index') }}" 
+                <a href="{{ route('admin.stock-receipts.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.stock-receipts.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"/>
@@ -121,7 +134,7 @@
                     <span>Nhập kho</span>
                 </a>
 
-                <a href="{{ route('admin.inventory.index') }}" 
+                <a href="{{ route('admin.inventory.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.inventory.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -129,7 +142,7 @@
                     <span>Kiểm kho</span>
                 </a>
 
-                <a href="{{ route('admin.orders.index') }}" 
+                <a href="{{ route('admin.orders.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.orders.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
@@ -163,7 +176,7 @@
 
                 <div class="pt-5 px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">Hệ thống & Người dùng</div>
 
-                <a href="{{ route('admin.customers.index') }}" 
+                <a href="{{ route('admin.customers.index') }}"
                    class="flex items-center gap-3.5 px-3.5 py-3 rounded-xl font-medium text-sm transition-all {{ request()->routeIs('admin.customers.*') ? 'bg-primary text-white shadow-lg shadow-primary/30 font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/60' }}">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -174,7 +187,7 @@
 
             <!-- Bottom Website Link -->
             <div class="p-4 border-t border-slate-800">
-                <a href="{{ route('home') }}" target="_blank" 
+                <a href="{{ route('home') }}" target="_blank"
                    class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-300 bg-slate-800/80 hover:bg-slate-700/80 hover:text-white transition-all">
                     <span class="flex items-center gap-2">
                         <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -224,7 +237,7 @@
                             </svg>
                         </button>
 
-                        <div x-show="open" 
+                        <div x-show="open"
                              x-transition:enter="transition ease-out duration-150"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100"
@@ -232,7 +245,7 @@
                              x-transition:leave-start="opacity-100 scale-100"
                              x-transition:leave-end="opacity-0 scale-95"
                              class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50" style="display: none;">
-                            
+
                             <div class="px-4 py-2 border-b border-slate-100">
                                 <p class="text-[11px] text-slate-400">Đang đăng nhập:</p>
                                 <p class="text-xs font-bold text-slate-700 truncate">{{ auth()->user()->email }}</p>
@@ -263,9 +276,9 @@
 
             <!-- Toast Popup Notifications -->
             @if(session('success') || session('error') || session('warning') || session('info'))
-            <div x-data="{ show: true }" 
+            <div x-data="{ show: true }"
                  x-init="setTimeout(() => show = false, 4000)"
-                 x-show="show" 
+                 x-show="show"
                  x-cloak
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-4"
@@ -275,7 +288,7 @@
                  x-transition:leave-end="opacity-0"
                  class="fixed top-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border p-4 flex items-start gap-3 pointer-events-auto @if(session('error')) border-rose-200 @elseif(session('warning')) border-amber-200 @elseif(session('info')) border-sky-200 @else border-emerald-200 @endif"
                  role="alert">
-                
+
                 @if(session('success'))
                     <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
@@ -315,6 +328,29 @@
                 </button>
             </div>
             @endif
+
+            <!-- Dynamic JS Toast Notification -->
+            <div x-show="toastVisible"
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-4"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed top-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border border-emerald-200 p-4 flex items-start gap-3 pointer-events-auto"
+                 role="alert">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="flex-1 min-w-0 pt-0.5">
+                    <h4 class="text-xs font-bold text-slate-900">Thông báo</h4>
+                    <p class="text-xs text-slate-600 mt-0.5 leading-relaxed" x-text="toastMessage"></p>
+                </div>
+                <button type="button" @click="toastVisible = false" class="text-slate-400 hover:text-slate-600 p-1 -mr-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
 
             <!-- Page Body -->
             <main class="flex-1 overflow-y-auto px-4 sm:px-8 pb-12">
