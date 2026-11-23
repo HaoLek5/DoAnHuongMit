@@ -113,49 +113,49 @@
                         <h2 class="text-base font-bold text-slate-800 mb-3 pb-3 border-b border-slate-100">Phương thức thanh toán</h2>
 
                         <div class="space-y-2.5">
-                            <!-- COD Option -->
-                            <template x-if="allowCod">
-                                <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
-                                       :class="paymentMethod === 'cod' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" name="payment_method" value="cod" x-model="paymentMethod"
-                                               class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
-                                        <span class="text-xs sm:text-sm font-bold text-slate-800">Thanh toán khi nhận hàng (COD)</span>
-                                    </div>
-                                    <template x-if="totalPrice > 400000">
-                                        <span class="text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-lg border border-amber-200">
-                                            Cọc 40% (<span x-text="formatCurrency(depositAmount)"></span>)
-                                        </span>
-                                    </template>
-                                </label>
-                            </template>
-                            <template x-if="!allowCod">
-                                <div class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-slate-200 bg-slate-50 opacity-70 cursor-not-allowed">
-                                    <div class="flex items-center gap-3">
-                                        <input type="radio" disabled class="text-slate-400 h-4 w-4 border-slate-300 cursor-not-allowed">
-                                        <div>
-                                            <span class="text-xs sm:text-sm font-bold text-slate-500 line-through">Thanh toán khi nhận hàng (COD)</span>
-                                            <p class="text-[11px] text-rose-500 font-medium mt-0.5">Sản phẩm trong giỏ hàng chỉ cho phép thanh toán Chuyển khoản</p>
-                                        </div>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-200">
-                                        Không hỗ trợ COD
-                                    </span>
-                                </div>
-                            </template>
-
-                            <!-- Bank Transfer (VietQR) Option -->
+                            <!-- 1. Contact Shop Option (Mới, Hoạt động) -->
                             <label class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border cursor-pointer transition-all"
-                                   :class="paymentMethod === 'bank_transfer' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
+                                   :class="paymentMethod === 'contact_shop' ? 'border-primary bg-primary-50/15' : 'border-slate-200/80 hover:border-slate-300 bg-white'">
                                 <div class="flex items-center gap-3">
-                                    <input type="radio" name="payment_method" value="bank_transfer" x-model="paymentMethod"
+                                    <input type="radio" name="payment_method" value="contact_shop" x-model="paymentMethod"
                                            class="text-primary focus:ring-primary h-4 w-4 border-slate-300">
-                                    <span class="text-xs sm:text-sm font-bold text-slate-800">Chuyển khoản ngân hàng (VietQR)</span>
+                                    <div>
+                                        <span class="text-xs sm:text-sm font-bold text-slate-800">Liên hệ shop</span>
+                                        <p class="text-[11px] text-slate-500 font-normal mt-0.5">Shop sẽ liên hệ với bạn để tư vấn, xác nhận đơn hàng và hướng dẫn giao nhận</p>
+                                    </div>
                                 </div>
-                                <span class="text-[11px] font-bold text-primary bg-primary-50 px-2.5 py-0.5 rounded-lg border border-primary-100">
-                                    Tự động 24/7
+                                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200">
+                                    Miễn phí cọc
                                 </span>
                             </label>
+
+                            <!-- 2. COD Option (Tạm khóa) -->
+                            <div class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 opacity-60 cursor-not-allowed">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" disabled class="text-slate-400 h-4 w-4 border-slate-300 cursor-not-allowed">
+                                    <div>
+                                        <span class="text-xs sm:text-sm font-bold text-slate-500">Thanh toán khi nhận hàng (COD)</span>
+                                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Phương thức này đang tạm khóa, vui lòng chọn Liên hệ shop</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-lg border border-slate-300/60">
+                                    Tạm khóa
+                                </span>
+                            </div>
+
+                            <!-- 3. Bank Transfer (VietQR) Option (Tạm khóa) -->
+                            <div class="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 bg-slate-50/70 opacity-60 cursor-not-allowed">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" disabled class="text-slate-400 h-4 w-4 border-slate-300 cursor-not-allowed">
+                                    <div>
+                                        <span class="text-xs sm:text-sm font-bold text-slate-500">Chuyển khoản ngân hàng (VietQR)</span>
+                                        <p class="text-[11px] text-slate-400 font-medium mt-0.5">Phương thức này đang tạm khóa, vui lòng chọn Liên hệ shop</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-bold text-slate-500 bg-slate-200/70 px-2 py-0.5 rounded-lg border border-slate-300/60">
+                                    Tạm khóa
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -259,6 +259,14 @@
                                     class="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-rose-500 hover:from-primary-600 hover:to-rose-600 text-white font-extrabold text-sm shadow-md shadow-primary/30 hover:shadow-xl hover:scale-[1.01] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <template x-if="!isSubmitting">
                                     <div class="flex items-center gap-2">
+                                        <template x-if="paymentMethod === 'contact_shop'">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                                                </svg>
+                                                <span>Xác nhận đặt hàng (Liên hệ shop)</span>
+                                            </div>
+                                        </template>
                                         <template x-if="paymentMethod === 'cod'">
                                             <div class="flex items-center gap-2">
                                                 <template x-if="totalPrice > 400000">
@@ -534,14 +542,14 @@
             selectedAddressId: {{ $defaultAddress ? $defaultAddress->id : ($addresses->first() ? $addresses->first()->id : 'null') }},
             tempSelectedAddressId: null,
             allowCod: {{ ($allowCod ?? true) ? 'true' : 'false' }},
-            paymentMethod: '{{ old('payment_method', ($allowCod ?? true) ? 'cod' : 'bank_transfer') }}',
+            paymentMethod: '{{ old('payment_method', 'contact_shop') }}',
             totalPrice: {{ (float) $cart->total_price }},
 
             get isCodWithDeposit() {
                 return this.paymentMethod === 'cod' && this.totalPrice > 400000;
             },
             get depositAmount() {
-                return Math.round(this.totalPrice * 0.40);
+                return this.isCodWithDeposit ? Math.round(this.totalPrice * 0.40) : 0;
             },
             get remainingAmount() {
                 return this.totalPrice - this.depositAmount;

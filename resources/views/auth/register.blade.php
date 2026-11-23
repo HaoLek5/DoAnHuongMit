@@ -73,11 +73,10 @@
             @enderror
         </div>
 
-        {{-- Phone (optional) --}}
+        {{-- Phone (required) --}}
         <div class="mb-4">
             <label for="reg-phone" class="block text-sm font-medium text-gray-700 mb-1.5">
-                Số điện thoại
-                <span class="text-gray-400 font-normal">(không bắt buộc)</span>
+                Số điện thoại <span class="text-red-500">*</span>
             </label>
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
@@ -90,6 +89,7 @@
                     type="tel"
                     name="phone"
                     value="{{ old('phone') }}"
+                    required
                     autocomplete="tel"
                     placeholder="0912 345 678"
                     class="input-field w-full pl-10 pr-4 py-3 rounded-xl border {{ $errors->has('phone') ? 'border-red-400 bg-red-50' : 'border-gray-200 bg-gray-50' }} text-sm focus:bg-white"

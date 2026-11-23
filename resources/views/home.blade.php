@@ -14,11 +14,6 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div class="lg:col-span-7 space-y-5 text-center lg:text-left">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-primary-200 text-primary text-xs font-bold shadow-xs">
-                    <span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
-                    <span>Sản phẩm chất lượng cho Mẹ & Bé</span>
-                </div>
-
                 <h1 class="text-3xl sm:text-5xl lg:text-5xl font-display font-extrabold text-gray-800 leading-tight">
                     Chăm sóc bé yêu trọn vẹn với <br class="hidden sm:inline">
                     <span class="text-gradient">Hương Mít</span>

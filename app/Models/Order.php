@@ -121,7 +121,7 @@ class Order extends Model
 
     public function getShippingCarrierAttribute(): string
     {
-        return $this->payment_method === 'cod' ? 'GHTK' : 'VTP';
+        return in_array($this->payment_method, ['cod', 'contact_shop'], true) ? 'GHTK' : 'VTP';
     }
 
     public function getPaymentMethodLabelAttribute(): string
@@ -129,6 +129,7 @@ class Order extends Model
         return match ($this->payment_method) {
             'cod' => 'Thanh toán khi nhận hàng (COD)',
             'bank_transfer' => 'Chuyển khoản ngân hàng',
+            'contact_shop' => 'Liên hệ shop',
             default => strtoupper((string) $this->payment_method),
         };
     }

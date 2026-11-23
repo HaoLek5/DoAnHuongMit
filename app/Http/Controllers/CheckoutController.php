@@ -220,7 +220,7 @@ class CheckoutController extends Controller
         // Quy tắc validation
         $rules = [
             'address_type' => ['required', 'in:existing,new'],
-            'payment_method' => ['required', 'in:cod,bank_transfer'],
+            'payment_method' => ['required', 'in:contact_shop,cod,bank_transfer'],
             'note' => ['nullable', 'string', 'max:500'],
         ];
 
@@ -246,7 +246,7 @@ class CheckoutController extends Controller
             'payment_method.in' => 'Phương thức thanh toán đã chọn không hợp lệ.',
         ]);
 
-        $paymentMethod = $request->input('payment_method', 'cod');
+        $paymentMethod = $request->input('payment_method', 'contact_shop');
 
         try {
             $outcome = DB::transaction(function () use ($request, $user, $cart, $selectedItemIds, $paymentMethod, $idempotencyKey): array {
@@ -451,7 +451,7 @@ class CheckoutController extends Controller
                     'discount_amount' => $discountAmount,
                     'shipping_fee' => $shippingFee,
                     'total_amount' => $totalAmount,
-                    'payment_method' => 'cod',
+                    'payment_method' => $paymentMethod,
                     'payment_status' => 'unpaid',
                     'deposit_required' => false,
                     'deposit_amount' => 0,
@@ -514,7 +514,9 @@ class CheckoutController extends Controller
                         'quantity' => -$item->quantity,
                         'reference_type' => 'order',
                         'reference_id' => $order->id,
-                        'note' => "Xuất kho bán hàng đơn #{$order->order_code}",
+                        'note' => $paymentMethod === 'contact_shop'
+                            ? "Xuất kho bán hàng đơn Liên hệ shop #{$order->order_code}"
+                            : "Xuất kho bán hàng đơn #{$order->order_code}",
                         'created_by' => $user->id,
                         'created_at' => now(),
                     ]);
@@ -524,10 +526,12 @@ class CheckoutController extends Controller
                 Payment::create([
                     'order_id' => $order->id,
                     'payment_type' => 'final',
-                    'payment_method' => 'cod',
+                    'payment_method' => $paymentMethod,
                     'amount' => $totalAmount,
                     'status' => 'pending',
-                    'note' => 'Thanh toán tiền mặt khi nhận hàng (COD)',
+                    'note' => $paymentMethod === 'contact_shop'
+                        ? 'Đơn hàng chọn phương thức Liên hệ shop - Thanh toán sau khi liên hệ / nhận hàng'
+                        : 'Thanh toán tiền mặt khi nhận hàng (COD)',
                 ]);
 
                 // 4. Xóa các sản phẩm đã đặt khỏi giỏ hàng

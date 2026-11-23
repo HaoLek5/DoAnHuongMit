@@ -41,13 +41,14 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:191'],
-            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9\+\-\s\(\)]+$/'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ], [
             'name.required' => 'Vui lòng nhập họ tên.',
             'name.max' => 'Họ tên không được vượt quá 100 ký tự.',
             'email.required' => 'Vui lòng nhập email.',
             'email.email' => 'Địa chỉ email không hợp lệ.',
+            'phone.required' => 'Vui lòng nhập số điện thoại.',
             'phone.regex' => 'Số điện thoại không hợp lệ.',
             'password.required' => 'Vui lòng nhập mật khẩu.',
             'password.confirmed' => 'Xác nhận mật khẩu không khớp.',

@@ -83,6 +83,23 @@ class AuthEmailVerificationTest extends TestCase
         ]);
     }
 
+    public function test_registration_requires_phone_number(): void
+    {
+        Mail::fake();
+
+        $response = $this->post(route('auth.register.post'), [
+            'name' => 'Nguyễn Văn B',
+            'email' => 'nguyenvanb@example.com',
+            'phone' => '',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ]);
+
+        $response->assertSessionHasErrors(['phone']);
+        $this->assertDatabaseMissing('users', ['email' => 'nguyenvanb@example.com']);
+        Mail::assertNothingSent();
+    }
+
     public function test_user_cannot_verify_with_wrong_code(): void
     {
         $user = User::factory()->unverified()->create([

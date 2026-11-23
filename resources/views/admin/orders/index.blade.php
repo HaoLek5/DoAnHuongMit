@@ -191,6 +191,10 @@
                                     <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary-50 text-primary border border-primary/20 mt-0.5" title="Đã chuyển khoản VietQR">
                                         VietQR (Đã TT)
                                     </span>
+                                @elseif($order->payment_method === 'contact_shop')
+                                    <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 mt-0.5" title="Liên hệ shop">
+                                        Liên hệ shop
+                                    </span>
                                 @else
                                     <span class="text-[10px] text-slate-400 block mt-0.5">COD</span>
                                 @endif

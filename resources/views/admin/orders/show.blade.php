@@ -257,20 +257,56 @@
             </div>
         </div>
 
-        <!-- Card 2: Thông tin giao hàng (4 cols) -->
+        <!-- Card 2: Thông tin giao hàng & Người đặt (4 cols) -->
         <div class="lg:col-span-4 bg-white rounded-3xl border border-slate-100 p-6 shadow-sm space-y-5">
             <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
                 <span class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                 </span>
-                <h3 class="text-base font-bold text-slate-800">Thông tin giao hàng</h3>
+                <h3 class="text-base font-bold text-slate-800">Khách hàng & Giao nhận</h3>
             </div>
 
             <div class="space-y-4 text-xs">
+                <!-- Customer account info (Người đặt) -->
+                <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 font-semibold flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Người đặt hàng
+                        </span>
+                        @if($order->user)
+                            <a href="{{ route('admin.customers.show', $order->user) }}" class="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-0.5">
+                                Hồ sơ khách
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </a>
+                        @endif
+                    </div>
+                    @if($order->user)
+                        <div>
+                            <div class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                <span>{{ $order->user->name }}</span>
+                                <span class="text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-mono font-normal">#KH{{ str_pad($order->user->id, 4, '0', STR_PAD_LEFT) }}</span>
+                            </div>
+                            <div class="text-slate-700 font-mono mt-1 text-xs">
+                                SĐT: {{ $order->user->phone ?? 'Chưa cập nhật' }}
+                            </div>
+                            <div class="text-slate-500 mt-0.5 truncate text-[11px]">
+                                Email: {{ $order->user->email }}
+                            </div>
+                        </div>
+                    @else
+                        <div class="text-slate-400 italic">
+                            Khách vãng lai / Tài khoản không tồn tại
+                        </div>
+                    @endif
+                </div>
+
                 <!-- Receiver info -->
-                <div>
+                <div class="pt-1">
                     <span class="text-slate-400 block mb-1">Người nhận hàng</span>
                     <div class="font-bold text-slate-800 text-sm">{{ $order->receiver_name }}</div>
                     <div class="font-bold text-slate-700 mt-0.5 font-mono">{{ $order->receiver_phone }}</div>
@@ -361,15 +397,6 @@
                         </div>
                     </div>
                 @endif
-
-                <!-- Customer account info -->
-                <div class="pt-3 border-t border-slate-100">
-                    <span class="text-slate-400 block mb-1">Tài khoản đặt hàng</span>
-                    <div class="font-bold text-slate-800">{{ $order->user?->name ?? 'Khách vãng lai' }}</div>
-                    @if($order->user?->email)
-                        <div class="text-slate-500 text-[11px]">{{ $order->user->email }}</div>
-                    @endif
-                </div>
 
                 <!-- Order note -->
                 @if($order->note)

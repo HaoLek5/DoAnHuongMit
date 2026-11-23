@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Address;
+use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -156,5 +157,36 @@ class AdminCustomerTest extends TestCase
         $response->assertRedirect();
         $this->admin->refresh();
         $this->assertFalse($this->admin->isLocked());
+    }
+
+    /**
+     * Admin order detail displays buyer account info and receiver info.
+     */
+    public function test_admin_order_detail_displays_buyer_account_info(): void
+    {
+        $order = Order::create([
+            'order_code' => 'DH-TEST-BUYER-01',
+            'user_id' => $this->customer->id,
+            'receiver_name' => 'Người Nhận Test',
+            'receiver_phone' => '0912345678',
+            'shipping_address' => '123 Đường Cầu Giấy, Hà Nội',
+            'subtotal' => 200000,
+            'shipping_fee' => 0,
+            'total_amount' => 200000,
+            'payment_method' => 'contact_shop',
+            'payment_status' => 'unpaid',
+            'order_status' => 'pending',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get("/admin/orders/{$order->id}");
+
+        $response->assertStatus(200)
+            ->assertSee('Khách hàng & Giao nhận', false)
+            ->assertSee('Người đặt hàng')
+            ->assertSee('Customer Demo')
+            ->assertSee('customer_test@haomilk.vn')
+            ->assertSee('0988776655')
+            ->assertSee('Người Nhận Test')
+            ->assertSee('0912345678');
     }
 }
